@@ -2,6 +2,7 @@
   "name": "autotrader-web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Premium automotive dealership platform - Next.js foundation.",
   "engines": {
     "node": ">=20.0.0"
@@ -15,12 +16,30 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate",
+    "db:start": "docker compose --env-file .env.local up -d",
+    "db:stop": "docker compose --env-file .env.local stop",
+    "db:down": "docker compose --env-file .env.local down",
+    "db:logs": "docker compose --env-file .env.local logs -f postgres",
+    "db:status": "docker compose --env-file .env.local ps",
+    "db:reset": "node scripts/db-reset.mjs",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:validate": "prisma validate",
+    "db:format": "prisma format",
+    "db:studio": "prisma studio",
+    "db:check": "node scripts/check-db-connection.ts"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.9.0",
+    "@prisma/client": "^7.9.0",
+    "dotenv": "^17.4.2",
     "next": "16.2.10",
+    "pg": "^8.22.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -32,6 +51,7 @@
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.5",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "prisma": "^7.9.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

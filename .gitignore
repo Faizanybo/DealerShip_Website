@@ -57,3 +57,6 @@ next-env.d.ts
 # logs
 logs/
 *.log
+
+# Prisma: generated client is regenerated via `pnpm db:generate`, never hand-edited.
+src/server/db/generated/

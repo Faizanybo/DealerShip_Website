@@ -15,3 +15,6 @@ next-env.d.ts
 # Misc
 .vercel/
 public/
+
+# Prisma generated client (auto-generated, never hand-edited)
+src/server/db/generated/

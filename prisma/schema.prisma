@@ -1,0 +1,36 @@
+// Prisma schema — Phase 1.2 (data-layer foundation only).
+//
+// Only a minimal technical connectivity model (`SystemHealth`) is defined here.
+// The full domain model (Vehicle, User, Enquiry, SyncEvent, Image, Feature,
+// Auto Trader entities, etc.) is intentionally deferred to the dedicated
+// database-design phase.
+//
+// The generated client is written into src/server/db/generated (the reserved
+// database-access-layer location) and is NOT committed to git — it is
+// regenerated via `pnpm db:generate`.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/server/db/generated"
+  // Explicit ".ts" extensions (rather than the bundler-inferred bare imports)
+  // let the generated client also run directly under plain `node` — used by
+  // the standalone `pnpm db:check` connectivity script.
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Minimal connectivity/health-check model. Used only to verify that Prisma
+/// migrations and the database connection work end-to-end. Not a domain model.
+model SystemHealth {
+  id        String   @id @default(cuid())
+  service   String
+  status    String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_health")
+}

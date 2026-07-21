@@ -1,0 +1,40 @@
+# Local development infrastructure only.
+#
+# This file intentionally provisions PostgreSQL alone. The Next.js application
+# is NOT containerized yet and continues to run on the host via `pnpm dev`.
+#
+# Values are supplied via --env-file .env.local (see package.json "db:*" scripts
+# and README.md → "Local Database"). Sensible non-secret defaults are provided
+# via ${VAR:-default} so `docker compose up` also works without an env file.
+
+services:
+  postgres:
+    image: postgres:16.6-alpine
+    container_name: autotrader-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-autotrader_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-autotrader}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autotrader_dev_password}
+      # Ensures UTF-8 encoding/collation regardless of the base image locale.
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --lc-collate=C --lc-ctype=C'
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - autotrader_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-autotrader} -d ${POSTGRES_DB:-autotrader_dev}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  # Named (not anonymous) so data survives `docker compose down`.
+  # Only `docker compose down -v` (i.e. `pnpm db:reset`) deletes it.
+  autotrader_postgres_data:
+    name: autotrader_postgres_data
