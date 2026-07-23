@@ -9,6 +9,7 @@ Structural, app-wide layout building blocks (site header, footer, navigation she
 
 - **`page-shell.tsx`** — `PageShell`: outermost full-height flex-column scaffold for a route.
 - **`container.tsx`** — `Container`: mobile-first horizontal gutter + max-width wrapper.
+  `size="default"` (80rem) or `size="wide"` (96rem, for showcase sections — currently only the hero).
 - **`section.tsx`** — `Section`: full-bleed vertical rhythm + background tone (`page` / `muted` /
   `hero`). `tone="hero"` locally applies the `dark` scope for cinematic sections.
 - **`section-header.tsx`** — `SectionHeader`: eyebrow + title + description heading block.
@@ -17,10 +18,14 @@ Structural, app-wide layout building blocks (site header, footer, navigation she
   and solid everywhere else.
 - **`footer.tsx`** — `Footer`: premium dark footer (server component), reads `siteConfig`.
 - **`brand-mark.tsx`** — `BrandMark`: temporary text + abstract-glyph logo, `currentColor`-based.
-- **`hero.tsx`** — `Hero`: dark cinematic homepage hero (server component); background is a pure
-  CSS/SVG treatment, not a photo — see `docs/homepage.md`.
-- **`hero-content.tsx`** — `HeroContent`: the hero's animated text/CTAs/scroll-indicator (client
-  component), isolated so `Hero` itself stays a Server Component.
+- **`hero.tsx`** — `Hero`: dark cinematic homepage hero (server component), two-column on `lg:` and up.
+  Background is a pure CSS/SVG treatment, not a photo — see `docs/homepage.md`.
+- **`hero-content.tsx`** — `HeroContent`: the hero's animated copy/CTAs/trust strip (client component),
+  isolated so `Hero` itself stays a Server Component.
+- **`hero-vehicle.tsx`** — `HeroVehicle`: the placeholder vehicle image + floating info card (client
+  component) — see `docs/homepage.md` for the placeholder-image note.
+- **`hero-scroll-indicator.tsx`** — `HeroScrollIndicator`: the hero's looping scroll cue, pinned to the
+  section's own bottom edge (client component).
 - **`page-placeholder.tsx`** — `PagePlaceholder`: shared "content in progress" shell used by every
   temporary public route (`/cars`, `/recently-sold`, `/about`, `/contact`).
 

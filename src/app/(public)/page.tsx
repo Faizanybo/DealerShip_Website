@@ -24,10 +24,14 @@ export default function HomePage() {
     <>
       <Hero
         eyebrow="Buying made simple"
-        headline={siteConfig.tagline}
+        // Split from `siteConfig.tagline` — each line animates in on its own beat
+        // (see `hero-content.tsx`) but the full sentence is still one semantic <h1>.
+        headlineLines={['Premium vehicles,', 'honestly', 'presented.']}
         supportingText={`We're putting together a straightforward, no-nonsense way to browse, compare, and buy your next car from ${siteConfig.dealershipName}. Explore what's currently available or get in touch with any questions.`}
         primaryCta={{ label: 'Browse cars', href: '/cars' }}
         secondaryCta={{ label: 'Contact us', href: '/contact' }}
+        // Neutral placeholders — replace with client-confirmed copy before launch.
+        trustItems={['Carefully inspected vehicles', 'Transparent pricing', 'Flexible finance']}
         scrollTargetId="intro"
       />
 

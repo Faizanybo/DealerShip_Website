@@ -63,12 +63,17 @@ kept as small and focused as possible; it is not the whole app.
   (`mobile-nav.tsx`) from the right, `85vw` wide capped at `max-w-sm` (fits 320px). Focus trap,
   `Esc` to close, and body-scroll locking are inherited for free from Radix. Selecting a link closes
   the sheet via `SheetClose`.
+- **Sizing**: `h-16 sm:h-20` (bumped from `h-16 sm:h-18` during the hero-elevation pass so the header's
+  presence better matches the enlarged hero), `size="wide"` `<Container>` (matching the hero), a larger
+  brand mark/wordmark, and slightly larger/roomier nav links (`desktop-nav.tsx`) — see
+  [`docs/homepage.md`](./homepage.md#header-behavior-on-the-hero).
 - **Positioning**: `fixed inset-x-0 top-0` (not `sticky` — changed in Phase 2.1). A `fixed` header is
   removed from normal flow so it can visually sit **on top of** the homepage hero instead of pushing
-  it down. `(public)/layout.tsx`'s `<main>` compensates with `pt-16 sm:pt-18` (matching the header's
-  `h-16 sm:h-18`) so every other page's content still starts below the header exactly as before;
+  it down. `(public)/layout.tsx`'s `<main>` compensates with `pt-16 sm:pt-20` (matching the header's
+  `h-16 sm:h-20`) so every other page's content still starts below the header exactly as before;
   `Hero` (see [`docs/homepage.md`](./homepage.md)) cancels that same padding with a matching
-  `-mt-16 sm:-mt-18` so it alone can bleed up to the very top of the page.
+  `-mt-16 sm:-mt-20` so it alone can bleed up to the very top of the page. **These three values must
+  always stay in sync** — see the comment above `Header` for the canonical list.
 - **Scroll behavior / variant**: `variant` is `'solid' | 'transparent' | 'auto'` (default `'auto'`).
   `'auto'` renders `'transparent'` on the homepage (`pathname === '/'`, the only route with a dark
   hero right now) and `'solid'` everywhere else — call sites never have to think about it, and
@@ -101,7 +106,7 @@ links.
 src/app/
 ├── layout.tsx            # Root: <html>/<body>, fonts, global metadata — NO Header/Footer
 ├── (public)/
-│   ├── layout.tsx          # Skip link + Header + <main> (pt-16 sm:pt-18) + Footer
+│   ├── layout.tsx          # Skip link + Header + <main> (pt-16 sm:pt-20) + Footer
 │   ├── page.tsx             # Homepage: Hero + structural sections (Phase 2.1) — see docs/homepage.md
 │   ├── cars/, recently-sold/, about/, contact/  # Temporary "content in progress" shells
 │   └── _components/         # Homepage-only section components (not routes)

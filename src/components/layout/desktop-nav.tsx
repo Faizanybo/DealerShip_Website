@@ -22,7 +22,7 @@ function DesktopNav({ items, pathname, className }: DesktopNavProps) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <nav aria-label="Primary" className={cn('hidden items-center gap-1 md:flex', className)}>
+    <nav aria-label="Primary" className={cn('hidden items-center gap-1.5 md:flex', className)}>
       {items.map((item) => {
         const active = isNavItemActive(pathname, item.href);
         return (
@@ -33,7 +33,7 @@ function DesktopNav({ items, pathname, className }: DesktopNavProps) {
             rel={item.external ? 'noopener noreferrer' : undefined}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'rounded-input focus-visible:ring-focus-ring relative px-3 py-2 text-sm font-medium text-current opacity-80 transition-opacity outline-none hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2',
+              'rounded-input focus-visible:ring-focus-ring relative px-4 py-2.5 text-[0.9375rem] font-medium text-current opacity-80 transition-opacity outline-none hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2',
               active && 'opacity-100',
             )}
           >
@@ -41,7 +41,7 @@ function DesktopNav({ items, pathname, className }: DesktopNavProps) {
             {active ? (
               <motion.span
                 layoutId="desktop-nav-underline"
-                className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-current"
+                className="absolute inset-x-4 -bottom-0.5 h-0.5 rounded-full bg-current"
                 transition={
                   prefersReducedMotion
                     ? { duration: 0 }

@@ -30,8 +30,9 @@ interface HeaderProps {
 /**
  * Fixed site header (removed from normal flow so a `transparent`/`auto`
  * homepage variant can visually sit on top of the hero instead of pushing
- * it down — see the matching `-mt-16 sm:-mt-18` pull-up on `Hero` and the
- * compensating `pt-16 sm:pt-18` on `(public)/layout.tsx`'s `<main>`).
+ * it down — see the matching `-mt-16 sm:-mt-20` pull-up on `Hero` and the
+ * compensating `pt-16 sm:pt-20` on `(public)/layout.tsx`'s `<main>`. All
+ * three must stay in sync with the header's own `h-16 sm:h-20`).
  * Detects "at the top of the page" via a 1px `IntersectionObserver`
  * sentinel (no scroll-event listener), so the only client-side cost is a
  * single cheap observer callback.
@@ -78,10 +79,10 @@ function Header({ variant = 'auto' }: HeaderProps) {
             : 'border-border-subtle bg-surface-page text-foreground shadow-subtle border-b',
         )}
       >
-        <Container className="flex h-16 items-center justify-between gap-3 sm:h-18">
+        <Container size="wide" className="flex h-16 items-center justify-between gap-4 sm:h-20">
           <BrandMark />
           <DesktopNav items={navItems} pathname={pathname} />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <PrimaryButton asChild className="hidden sm:inline-flex">
               <a href={`tel:${siteConfig.contact.phone}`}>
                 <Phone className="size-4" aria-hidden="true" />

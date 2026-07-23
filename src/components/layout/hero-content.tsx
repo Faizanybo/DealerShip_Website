@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ChevronDown } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 
-import { useMotionVariants } from '@/lib/motion';
+import { useMotionVariants, useScaleInteraction } from '@/lib/motion';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/app-button';
 import { BodyLarge, Display, Eyebrow } from '@/components/ui/typography';
 
@@ -15,75 +15,105 @@ export interface HeroCta {
 
 interface HeroContentProps {
   eyebrow: string;
-  headline: string;
+  headlineLines: string[];
   supportingText: string;
   primaryCta: HeroCta;
   secondaryCta: HeroCta;
-  /** Section id to scroll to — renders the scroll indicator when set. */
-  scrollTargetId?: string;
+  /** Short, neutral placeholder trust points — replace with real client copy before launch. */
+  trustItems: string[];
 }
 
 /**
- * Animated hero text block + CTAs + scroll indicator. Isolated from `Hero`
- * (a Server Component) so only this small subtree ships Motion's client
- * runtime — the background treatment and outer section stay server-rendered.
+ * Animated hero text block + CTAs + trust strip + scroll indicator.
+ * Isolated from `Hero` (a Server Component) so only this small subtree
+ * ships Motion's client runtime — the background treatment and outer
+ * section stay server-rendered.
+ *
+ * The headline is authored as an array of short lines (`headlineLines`) so
+ * each can animate in on its own beat, per the "line 1 → line 2 → line 3"
+ * entrance sequence. It still renders as a single `<h1>` for document
+ * outline/screen-reader purposes — the line breaks are a visual-only effect
+ * (`aria-hidden` on the split spans, full sentence in the heading's
+ * `aria-label`).
  */
 function HeroContent({
   eyebrow,
-  headline,
+  headlineLines,
   supportingText,
   primaryCta,
   secondaryCta,
-  scrollTargetId,
+  trustItems,
 }: HeroContentProps) {
   const container = useMotionVariants('staggerContainer');
   const item = useMotionVariants('fadeUp');
+  const scaleInteraction = useScaleInteraction();
 
   return (
     <motion.div
       initial="hidden"
       animate="visible"
       variants={container}
-      className="flex max-w-2xl flex-col gap-6"
+      className="flex max-w-xl flex-col gap-6"
     >
       <motion.div variants={item}>
         <Eyebrow>{eyebrow}</Eyebrow>
       </motion.div>
 
-      <motion.div variants={item}>
-        <Display as="h1" className="text-hero-foreground">
-          {headline}
-        </Display>
-      </motion.div>
+      <Display
+        as="h1"
+        aria-label={headlineLines.join(' ')}
+        className="text-hero-foreground text-[clamp(2.25rem,3.4vw+1.5rem,4.25rem)] leading-[1.08]"
+      >
+        {headlineLines.map((line, index) => (
+          <motion.span key={index} variants={item} aria-hidden="true" className="block">
+            {line}
+          </motion.span>
+        ))}
+      </Display>
 
       <motion.div variants={item}>
-        <BodyLarge className="text-hero-muted-foreground max-w-xl">{supportingText}</BodyLarge>
+        <BodyLarge className="text-hero-muted-foreground max-w-md">{supportingText}</BodyLarge>
       </motion.div>
 
       <motion.div variants={item} className="flex flex-col gap-3 pt-2 sm:flex-row">
-        <PrimaryButton asChild size="lg">
-          <Link href={primaryCta.href}>{primaryCta.label}</Link>
-        </PrimaryButton>
-        <SecondaryButton
-          asChild
-          size="lg"
-          className="border-hero-border text-hero-foreground bg-transparent hover:bg-white/10"
-        >
-          <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
-        </SecondaryButton>
+        <motion.span {...scaleInteraction} className="inline-block">
+          <PrimaryButton
+            asChild
+            size="lg"
+            className="group/cta shadow-subtle hover:shadow-elevated transition-shadow duration-300"
+          >
+            <Link href={primaryCta.href}>
+              {primaryCta.label}
+              <ArrowRight
+                className="size-4 transition-transform duration-300 group-hover/cta:translate-x-1"
+                aria-hidden="true"
+              />
+            </Link>
+          </PrimaryButton>
+        </motion.span>
+        <motion.span {...scaleInteraction} className="inline-block">
+          <SecondaryButton
+            asChild
+            size="lg"
+            className="border-hero-border text-hero-foreground bg-transparent hover:bg-white/10"
+          >
+            <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
+          </SecondaryButton>
+        </motion.span>
       </motion.div>
 
-      {scrollTargetId ? (
-        <motion.div variants={item} className="pt-6">
-          <a
-            href={`#${scrollTargetId}`}
-            aria-label="Scroll to learn more"
-            className="text-hero-muted-foreground hover:text-hero-foreground focus-visible:ring-focus-ring inline-flex rounded-full p-2 transition-colors outline-none focus-visible:ring-2"
+      {/* Trust strip — neutral placeholders; replace with client-confirmed copy before launch. */}
+      <motion.ul variants={item} className="flex flex-wrap gap-x-6 gap-y-2 pt-2">
+        {trustItems.map((trustItem) => (
+          <li
+            key={trustItem}
+            className="text-hero-muted-foreground flex items-center gap-1.5 text-sm"
           >
-            <ChevronDown className="size-5 motion-safe:animate-bounce" aria-hidden="true" />
-          </a>
-        </motion.div>
-      ) : null}
+            <Check className="text-brand-accent size-4 shrink-0" aria-hidden="true" />
+            {trustItem}
+          </li>
+        ))}
+      </motion.ul>
     </motion.div>
   );
 }

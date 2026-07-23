@@ -18,14 +18,14 @@ function BrandMark({ className }: { className?: string }) {
     <Link
       href="/"
       className={cn(
-        'rounded-input focus-visible:ring-focus-ring inline-flex items-center gap-2 outline-none focus-visible:ring-2',
+        'rounded-input focus-visible:ring-focus-ring inline-flex items-center gap-2.5 outline-none focus-visible:ring-2',
         className,
       )}
       aria-label={`${siteConfig.dealershipName} — home`}
     >
-      <BrandMarkGlyph className="size-7 shrink-0" />
+      <BrandMarkGlyph className="size-8 shrink-0 sm:size-9" />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-lg font-semibold tracking-tight">
+        <span className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
           {siteConfig.shortName}
         </span>
       </span>
