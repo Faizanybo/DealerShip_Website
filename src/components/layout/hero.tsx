@@ -13,21 +13,25 @@ interface HeroProps {
   secondaryCta: HeroCta;
   /** Short, neutral placeholder trust points — see `HeroContent` for the "replace before launch" note. */
   trustItems: string[];
+  /** Static caption above the vehicle visual — see `HeroVehicle` for why it isn't animated yet. */
+  featuredLabel: string;
   /** Section id on the page below to scroll to — renders a scroll indicator when set. */
   scrollTargetId?: string;
 }
 
 /**
  * Dark cinematic homepage hero (Server Component). Two-column on `lg:` and
- * up — copy/CTAs on the left (`HeroContent`), a single placeholder vehicle
- * visual on the right (`HeroVehicle`) — collapsing to a single stacked
- * column (copy, then vehicle) below `lg:`. The background is a pure CSS/SVG
- * treatment — layered gradients, soft abstract "light bloom" blobs, a
- * readability vignette, and a faint grain texture — rather than a photo of
- * its own; see `docs/homepage.md` → "Hero asset strategy".
+ * up — copy/CTAs on ~44% of the width on the left (`HeroContent`), a single
+ * placeholder vehicle visual on the remaining ~56% on the right
+ * (`HeroVehicle`) — collapsing to a single stacked column (copy, then
+ * vehicle) below `lg:`. The background is a pure CSS/SVG treatment —
+ * layered gradients, soft abstract "light bloom" blobs, a readability
+ * vignette, and a faint grain texture — rather than a photo of its own; see
+ * `docs/homepage.md` → "Hero asset strategy".
  *
- * Uses `size="wide"` on `<Container>` so the hero can use more of the
- * available desktop width than standard page content (see `container.tsx`).
+ * Uses `size="wide"` on `<Container>` (capped at 1504px, see `globals.css`
+ * → `--container-wide`) so the hero can use more of the available desktop
+ * width than standard page content (see `container.tsx`).
  *
  * Bleeds up under the fixed, transparent-on-home `Header` via a negative
  * top margin that exactly cancels the `pt-16 sm:pt-20` compensation added to
@@ -44,6 +48,7 @@ function Hero({
   primaryCta,
   secondaryCta,
   trustItems,
+  featuredLabel,
   scrollTargetId,
 }: HeroProps) {
   return (
@@ -59,7 +64,7 @@ function Hero({
         size="wide"
         className="relative z-10 flex flex-1 flex-col justify-center py-20 sm:py-24 lg:py-16"
       >
-        <div className="grid grid-cols-1 items-center gap-10 sm:gap-12 lg:grid-cols-[0.82fr_1fr] lg:gap-12">
+        <div className="grid grid-cols-1 items-center gap-10 sm:gap-12 lg:grid-cols-[0.8fr_1fr] lg:gap-12 xl:gap-16">
           <HeroContent
             eyebrow={eyebrow}
             headlineLines={headlineLines}
@@ -68,7 +73,7 @@ function Hero({
             secondaryCta={secondaryCta}
             trustItems={trustItems}
           />
-          <HeroVehicle />
+          <HeroVehicle label={featuredLabel} />
         </div>
       </Container>
 

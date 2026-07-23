@@ -90,8 +90,10 @@
   --spacing-content-gap: 1.5rem;
   --container-content: 80rem;
   /* Wider cap for showcase sections (currently only the homepage hero) that
-     should use more of the available desktop width than standard content. */
-  --container-wide: 96rem;
+     should use more of the available desktop width than standard content.
+     94rem (1504px) sits inside the ~1440–1520px target for the hero's
+     two-column composition. */
+  --container-wide: 94rem;
 
   /* Shadows */
   --shadow-subtle: 0 1px 2px 0 oklch(0 0 0 / 0.04), 0 1px 1px 0 oklch(0 0 0 / 0.03);

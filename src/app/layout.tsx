@@ -1,17 +1,24 @@
 import type { Metadata } from 'next';
-import { Bricolage_Grotesque, Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Manrope } from 'next/font/google';
 import './globals.css';
 
 import { siteConfig } from '@/config/site';
 
 /**
- * Typography system (Phase 1.3):
+ * Typography system — a restrained two-font system (plus a separate,
+ * narrow-purpose mono face):
  * - `Geist` — body/interface sans. Clean, restrained, highly legible at UI
- *   sizes; used for nearly everything (see `src/components/ui/typography.tsx`).
- * - `Bricolage Grotesque` — optional display face, used only for large
- *   cinematic headings (`<Display>`) where it adds premium character without
- *   being used widely enough to hurt performance or readability.
- * - `Geist Mono` — reserved for tabular/metadata content (specs, codes).
+ *   sizes; used for body copy, navigation, metadata, and buttons (see
+ *   `src/components/ui/typography.tsx`).
+ * - `Manrope` — display face, used only for large cinematic headings
+ *   (`<Display>`) and the hero's featured-vehicle label, where its bolder,
+ *   slightly geometric character reads as premium without being used widely
+ *   enough to hurt performance or readability. Replaced Bricolage Grotesque
+ *   during the hero-composition pass (see `docs/homepage.md`) — no other
+ *   change needed since every consumer references the `font-display`
+ *   Tailwind class, not the font by name.
+ * - `Geist Mono` — reserved for tabular/metadata content (specs, codes) —
+ *   a separate, narrow-purpose face, not part of the heading/body pairing.
  */
 const geistSans = Geist({
   variable: '--font-sans',
@@ -19,7 +26,7 @@ const geistSans = Geist({
   display: 'swap',
 });
 
-const bricolageGrotesque = Bricolage_Grotesque({
+const manrope = Manrope({
   variable: '--font-display',
   subsets: ['latin'],
   display: 'swap',
@@ -54,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${bricolageGrotesque.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${manrope.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-svh flex-col">{children}</body>
     </html>

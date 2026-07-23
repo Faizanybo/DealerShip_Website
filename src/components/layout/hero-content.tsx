@@ -30,11 +30,14 @@ interface HeroContentProps {
  * section stay server-rendered.
  *
  * The headline is authored as an array of short lines (`headlineLines`) so
- * each can animate in on its own beat, per the "line 1 → line 2 → line 3"
- * entrance sequence. It still renders as a single `<h1>` for document
- * outline/screen-reader purposes — the line breaks are a visual-only effect
- * (`aria-hidden` on the split spans, full sentence in the heading's
- * `aria-label`).
+ * each can animate in on its own beat (line 1 → line 2 → ...). Each
+ * authored line is still free to soft-wrap on its own if the column is too
+ * narrow for it (helped by `text-balance` on `<Display>`), so the visual
+ * line count naturally varies by viewport — see `docs/homepage.md` →
+ * "Hero headline" for why that's intentional rather than a bug. It still
+ * renders as a single `<h1>` for document outline/screen-reader purposes —
+ * the line breaks are a visual-only effect (`aria-hidden` on the split
+ * spans, full sentence in the heading's `aria-label`).
  */
 function HeroContent({
   eyebrow,
@@ -62,7 +65,7 @@ function HeroContent({
       <Display
         as="h1"
         aria-label={headlineLines.join(' ')}
-        className="text-hero-foreground text-[clamp(2.25rem,3.4vw+1.5rem,4.25rem)] leading-[1.08]"
+        className="text-hero-foreground text-[clamp(2.25rem,3.6vw+1.4rem,4.75rem)] leading-[1.05]"
       >
         {headlineLines.map((line, index) => (
           <motion.span key={index} variants={item} aria-hidden="true" className="block">

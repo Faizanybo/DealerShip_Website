@@ -14,15 +14,23 @@ interface DesktopNavProps {
 }
 
 /**
- * Horizontal primary navigation for `md:` and up. Active route gets an
+ * Horizontal primary navigation for `xl:` and up. Active route gets an
  * animated underline (shared `layoutId`, so it slides between items instead
  * of popping) — disabled under `prefers-reduced-motion`.
+ *
+ * Shown from `xl:` (not `md:`) because the navigation now has 8 top-level
+ * items — a single inline row of that many items doesn't comfortably fit
+ * alongside the brand mark and CTA below ~1280px, so tablet/small-laptop
+ * widths use the (already-scrollable) mobile `Sheet` menu instead. See
+ * `docs/application-shell.md` → "Navigation" for the reasoning and the
+ * follow-up recommendation if the client wants desktop nav to appear
+ * earlier.
  */
 function DesktopNav({ items, pathname, className }: DesktopNavProps) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <nav aria-label="Primary" className={cn('hidden items-center gap-1.5 md:flex', className)}>
+    <nav aria-label="Primary" className={cn('hidden items-center gap-2 xl:flex', className)}>
       {items.map((item) => {
         const active = isNavItemActive(pathname, item.href);
         return (

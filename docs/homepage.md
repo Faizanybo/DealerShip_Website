@@ -1,24 +1,34 @@
-# Homepage & Public Route Scaffolding (Phase 2.1 + Hero Elevation)
+# Homepage & Public Route Scaffolding (Phase 2.1 + Hero Elevation + Hero Composition)
 
 Foundation-only. This documents the homepage hero, the homepage's structural section foundation, and
-the temporary "content in progress" shells for the other public routes introduced in Phase 2.1, plus
-the later hero-elevation pass (two-column layout, placeholder vehicle image, richer motion). It does
-**not** cover vehicle listings, filtering, or any backend/Auto Trader integration — those are later
-phases. See also [`docs/design-system.md`](./design-system.md) (tokens/typography/motion) and
+the temporary "content in progress" shells for the other public routes introduced in Phase 2.1, the
+hero-elevation pass (two-column layout, placeholder vehicle image, richer motion), and the later
+hero-composition pass (wider two-column split, Manrope display font, removed floating card,
+integrated featured-vehicle label). It does **not** cover vehicle listings, filtering, or any
+backend/Auto Trader integration — those are later phases. See also
+[`docs/design-system.md`](./design-system.md) (tokens/typography/motion) and
 [`docs/application-shell.md`](./application-shell.md) (Header/Footer/navigation).
 
 ## Route status
 
 | Route            | Status                                                     |
 | ---------------- | ---------------------------------------------------------- |
-| `/`              | Real hero + structural section foundation (this phase)     |
+| `/`              | Real hero + structural section foundation                  |
 | `/cars`          | Temporary "content in progress" shell (`PagePlaceholder`)  |
 | `/recently-sold` | Temporary "content in progress" shell (`PagePlaceholder`)  |
+| `/finance`       | Temporary "content in progress" shell (`PagePlaceholder`)  |
+| `/warranty`      | Temporary "content in progress" shell (`PagePlaceholder`)  |
+| `/sell-your-car` | Temporary "content in progress" shell (`PagePlaceholder`)  |
 | `/about`         | Temporary "content in progress" shell (`PagePlaceholder`)  |
 | `/contact`       | Temporary shell + real phone/email links from `siteConfig` |
 
 None of these are final designs. `/cars` and `/recently-sold` in particular are placeholders until
-vehicle data exists — see "Future data source" below.
+vehicle data exists — see "Future data source" below and
+[`docs/research/autotrader-planned-integration.md`](./research/autotrader-planned-integration.md).
+`/finance`, `/warranty`, and `/sell-your-car` were added to match a premium dealership's typical
+information architecture (see
+[`docs/research/seymour-pope-analysis.md`](./research/seymour-pope-analysis.md)) — they stay
+static/marketing-only placeholders with no data dependency.
 
 ## Homepage hero (`src/components/layout/hero.tsx`)
 
@@ -32,24 +42,37 @@ Split into four pieces so only small, focused subtrees ship client JS:
   and the trust strip, animated in with a staggered fade-up (`useMotionVariants('staggerContainer')` /
   `'fadeUp'` from `src/lib/motion`, both reduced-motion-safe).
 - **`HeroVehicle`** (`hero-vehicle.tsx`, Client Component) — the placeholder vehicle image, its slow
-  floating motion, and the floating "Featured vehicle" info card. Isolated from `HeroContent` so the two
-  animate independently without re-rendering each other.
+  floating motion, and a static "Featured Vehicle" caption above it. Isolated from `HeroContent` so the
+  two animate independently without re-rendering each other. There is **no floating info card** here
+  (see "Removed: floating vehicle card" below).
 - **`HeroScrollIndicator`** (`hero-scroll-indicator.tsx`, Client Component) — the looping scroll cue,
   positioned `absolute` on the section itself (not inside either column) so it stays pinned to the
   hero's bottom edge regardless of how tall the copy or the vehicle visual end up being.
 
 Content comes from props passed by `(public)/page.tsx`. The headline is authored as
-`headlineLines: string[]` (currently `siteConfig.tagline` split into three short lines) so each line can
+`headlineLines: string[]` (currently `siteConfig.tagline` reworded into two short lines) so each line can
 animate in on its own beat — it still renders as a single semantic `<h1>` (see "Accessibility" below).
 
 ### Layout: two columns on `lg:` and up
 
-`Hero` lays out `HeroContent` (~45%) and `HeroVehicle` (~55%) side by side from `lg:` upward
-(`grid-cols-[0.82fr_1fr]`), inside a `<Container size="wide">` (96rem cap, vs. the standard 80rem — see
-`container.tsx`) so the hero uses meaningfully more of the available desktop width than standard page
-content. Below `lg:`, the grid collapses to a single stacked column — copy first, vehicle visual below —
-so the message reads first and the visual reinforces it on the way down, without needing a second,
-mobile-only layout to maintain.
+`Hero` lays out `HeroContent` (~44%) and `HeroVehicle` (~56%) side by side from `lg:` upward
+(`grid-cols-[0.8fr_1fr]`), inside a `<Container size="wide">` (94rem / 1504px cap, vs. the standard
+80rem — see `container.tsx`) so the hero uses meaningfully more of the available desktop width than
+standard page content, landing inside the ~1440–1520px target composition width. Below `lg:`, the grid
+collapses to a single stacked column — copy first, vehicle visual below — so the message reads first
+and the visual reinforces it on the way down, without needing a second, mobile-only layout to maintain.
+
+### Hero headline (`src/components/layout/hero-content.tsx`)
+
+`headlineLines` is authored as **two** short lines — `['Premium Vehicles,', 'Honestly Presented.']` —
+not one word per line. Each line is its own `motion.span` (so it can animate in on its own beat) but is
+still free to soft-wrap on its own if the column is too narrow for it, helped by `text-balance` on
+`<Display>` (which prevents an awkward one-word orphan on the wrapped line). That's why the visual line
+count isn't fixed: on a narrow `lg:` column with the large hero type size, "Premium Vehicles," can wrap
+into two visual lines (≈3 total with "Honestly Presented."), while on mobile's full-width, smaller-type
+single column both authored lines are more likely to fit as one visual line each (≈2 total). This is
+intentional per the hero-composition brief ("allow the layout to break this naturally... do not force
+every word onto a separate line") rather than a bug.
 
 ### Hero vehicle image (`src/components/layout/hero-vehicle.tsx`)
 
@@ -58,12 +81,23 @@ brandless dark sedan silhouette with no manufacturer logos, badges, or plates, s
 studio so it blends into the hero background. It is explicitly **not** real dealership photography and
 must be replaced with client-supplied photography before production. It's rendered with `next/image`
 (`fill`, `priority` since it's an above-the-fold LCP candidate, explicit `sizes`), `object-contain`, a
-soft `drop-shadow`, and a bottom mask-image gradient so it fades into the hero background rather than
-ending in a hard rectangular edge. A slow (`8s`, looping) vertical float is layered on top —
-`prefers-reduced-motion` disables it entirely, leaving the image static.
+soft `drop-shadow`, and a **radial** (not just bottom) mask-image gradient so every edge — not only the
+bottom — fades into the hero background rather than ending in a hard rectangular edge. A slow (`8s`,
+looping) vertical float is layered on top — `prefers-reduced-motion` disables it entirely, leaving the
+image static. A second, tighter blurred glow (bronze, low opacity) sits along the vehicle's upper edge
+as a restrained "rim light", distinct from the broader ambient glow behind it.
 
-The floating "Featured vehicle" card next to it is a **decorative visual element only** — it does not
-read from any inventory data and must stay that way until real featured-vehicle logic exists.
+Above the image sits a short, static "Featured Vehicle" caption (`font-display`, uppercase, wide
+letter-spacing, a bronze-to-muted gradient via `background-clip: text`) — plain typography, not a card.
+
+### Removed: floating vehicle card
+
+An earlier pass had a bordered "Featured vehicle" info card (icon + two lines of text) overlapping the
+bottom-left of the vehicle image. It was **permanently removed** during the hero-composition pass — the
+brief was explicit that the visual should read as one integrated scene, not a photo with a UI card
+bolted onto it. Its component markup, the `Sparkles` icon import, and its dedicated entrance-animation
+values were all deleted from `hero-vehicle.tsx`, not just hidden. It was not replaced with another card
+— the "Featured Vehicle" caption above the image is plain text, with no background, border, or icon.
 
 ### Layered background (`HeroBackground` inside `hero.tsx`)
 
@@ -118,10 +152,11 @@ before launch. No claims about actual inspection processes, pricing, or finance 
   line breaks.
 - The hero vehicle image has a short, honest `alt="Premium vehicle"` — it is a real (if generic)
   vehicle image, not a purely decorative texture, so it isn't `alt=""`.
-- The floating "Featured vehicle" card and trust-strip icons are `aria-hidden`; their adjacent text
-  remains visible to assistive tech.
-- All hero motion (headline stagger, vehicle float, floating card, scroll indicator dot) is
-  reduced-motion-safe — see `useReducedMotion`/`useMotionVariants` usage in each component.
+- The trust-strip icons are `aria-hidden`; their adjacent text remains visible to assistive tech.
+- All hero motion (headline stagger, vehicle float, featured-vehicle caption fade, scroll indicator
+  dot) is reduced-motion-safe — see `useReducedMotion`/`useMotionVariants` usage in each component. The
+  featured-vehicle caption is currently a simple whole-string fade (no character-by-character reveal —
+  that's a deliberately separate, later piece of work).
 
 ## Homepage structural foundation (`src/app/(public)/_components/`)
 
@@ -140,7 +175,8 @@ data-driven later. All copy is neutral and generic — no statistics, testimonia
 
 ## Temporary route shells (`src/components/layout/page-placeholder.tsx`)
 
-`/cars`, `/recently-sold`, `/about`, and `/contact` all render `<PagePlaceholder>`: a `StatusBadge`
+`/cars`, `/recently-sold`, `/finance`, `/warranty`, `/sell-your-car`, `/about`, and `/contact` all render
+`<PagePlaceholder>`: a `StatusBadge`
 reading "Content in progress", an eyebrow, a `PageTitle` (the page's one `<h1>`), and a short
 description. `/contact` passes `children` to additionally show the phone/email already configured in
 `siteConfig` (the same values shown in the Footer) so visitors have an immediate way to reach out.

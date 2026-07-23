@@ -20,14 +20,21 @@ export interface NavItem {
 }
 
 /**
- * Primary public navigation. Routes are placeholders for pages that don't
- * exist yet (Phase 1.4 only builds the shell) — the Header renders these
- * links, but the target pages themselves are built in later phases.
+ * Primary public navigation. Every route below exists (either as a real page
+ * or a temporary `PagePlaceholder` shell — see `docs/homepage.md`), so
+ * nothing here 404s. The set and order was expanded to match the
+ * information architecture typically found on premium dealership sites
+ * (see `docs/research/seymour-pope-analysis.md`) — Header/Footer only ever
+ * read from this array, so reordering or renaming items here is the only
+ * change needed to update navigation everywhere.
  */
 export const primaryNavigation: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Cars', href: '/cars' },
   { label: 'Recently Sold', href: '/recently-sold' },
+  { label: 'Finance', href: '/finance' },
+  { label: 'Warranty', href: '/warranty' },
+  { label: 'Sell Your Car', href: '/sell-your-car' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ];

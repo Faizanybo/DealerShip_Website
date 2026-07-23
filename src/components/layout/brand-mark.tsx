@@ -23,9 +23,9 @@ function BrandMark({ className }: { className?: string }) {
       )}
       aria-label={`${siteConfig.dealershipName} — home`}
     >
-      <BrandMarkGlyph className="size-8 shrink-0 sm:size-9" />
+      <BrandMarkGlyph className="size-9 shrink-0 sm:size-10" />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
+        <span className="font-display text-2xl font-semibold tracking-tight sm:text-[1.75rem]">
           {siteConfig.shortName}
         </span>
       </span>

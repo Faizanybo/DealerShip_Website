@@ -58,11 +58,16 @@ Everything else (buttons, focus rings, badges, links) derives from these.
 
 ## Typography
 
-- **Body/interface**: `Geist` (via `next/font/google`) — clean, restrained, excellent at small UI
-  sizes. Used for nearly everything.
-- **Display**: `Bricolage Grotesque` — used _only_ for `<Display>` (large cinematic headings), for
-  premium character without the performance/readability cost of using it everywhere.
-- **Mono**: `Geist Mono` — reserved for tabular/metadata content (specs, reference codes) later.
+A restrained two-font system, both loaded via `next/font/google` (no external stylesheet imports):
+
+- **Body/interface**: `Geist` — clean, restrained, excellent at small UI sizes. Used for body copy,
+  navigation, metadata, and buttons — nearly everything.
+- **Display**: `Manrope` — used _only_ for `<Display>` (large cinematic headings) and the homepage
+  hero's featured-vehicle caption, for premium character without the performance/readability cost of
+  using it everywhere. Replaced Bricolage Grotesque during the hero-composition pass; every consumer
+  references the `font-display` Tailwind class rather than the font by name, so nothing else changed.
+- **Mono**: `Geist Mono` — reserved for tabular/metadata content (specs, reference codes) later. A
+  separate, narrow-purpose face outside the heading/body pairing above.
 
 Components (`src/components/ui/typography.tsx`): `Display`, `PageTitle`, `SectionTitle`,
 `CardTitle`, `BodyLarge`, `Body`, `BodySmall`, `Eyebrow`, `Metadata`. Each accepts `as` to change the

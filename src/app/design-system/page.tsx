@@ -130,7 +130,7 @@ export default function DesignSystemPreviewPage() {
             <SectionHeader
               eyebrow="Typography"
               title="Type hierarchy"
-              description="One interface sans (Geist) for nearly everything, one optional display face (Bricolage Grotesque) reserved for large cinematic headings."
+              description="One interface sans (Geist) for nearly everything, one display face (Manrope) reserved for large cinematic headings."
             />
             <div className="rounded-card border-border-subtle bg-surface-elevated flex flex-col gap-4 border p-6">
               <Display as="h3">Display heading</Display>

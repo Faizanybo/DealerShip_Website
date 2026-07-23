@@ -43,30 +43,48 @@ export interface NavItem {
 }
 ```
 
-`primaryNavigation` (Home, Cars, Recently Sold, About, Contact) and `legalNavigation` are exported
-from here and re-exported through `siteConfig.navigation`. Only `Home` (`/`) currently resolves to
-a real page — the rest are **planned routes**; they render in the Header/Footer now so the
-information architecture is settled, but will 404 until their pages are built in later phases.
-Use `getVisibleNavItems()` to filter out `visible: false` items, and `isNavItemActive(pathname, href)`
-for active-route matching (exact match for `/`, prefix match otherwise).
+`primaryNavigation` (Home, Cars, Recently Sold, Finance, Warranty, Sell Your Car, About, Contact) and
+`legalNavigation` are exported from here and re-exported through `siteConfig.navigation`. The set was
+expanded from the original five items to match the information architecture typically found on
+comparable premium dealership sites — see
+[`docs/research/seymour-pope-analysis.md`](./research/seymour-pope-analysis.md) for the research behind
+that decision. Every route now resolves to at least a temporary `PagePlaceholder` shell (see
+`docs/homepage.md`), so nothing 404s; `Home`, `Cars`, `Recently Sold`, `About`, and `Contact` are the
+only ones with any real content beyond the placeholder. Use `getVisibleNavItems()` to filter out
+`visible: false` items, and `isNavItemActive(pathname, href)` for active-route matching (exact match for
+`/`, prefix match otherwise).
+
+**Desktop nav breakpoint:** `DesktopNav` now renders from `xl:` (1280px) instead of `md:` (768px), with
+`MobileNav`'s trigger button mirroring it (`xl:hidden`). Eight top-level items in a single inline row —
+alongside the brand mark and "Call us" CTA — no longer comfortably fits below that width, so
+tablet/small-laptop viewports now use the mobile `Sheet` menu instead (already built to handle any
+number of items via `overflow-y-auto`, so no new component was needed). If the client later wants the
+inline desktop row to appear earlier than 1280px, that's a real design decision (likely grouping some
+items, e.g. Finance/Warranty/Sell Your Car under a dropdown) rather than a simple breakpoint tweak —
+flagged as a follow-up, not solved here.
 
 ## Header (`src/components/layout/header.tsx`)
 
 A client component (needs `usePathname()` for active-route state and a scroll-position check) —
 kept as small and focused as possible; it is not the whole app.
 
-- **Desktop** (`md:` and up): brand mark on the left, centered/balanced nav (`desktop-nav.tsx`) with
-  an animated underline under the active item (`motion`, shared `layoutId`, skipped entirely under
-  `prefers-reduced-motion`), and a "Call us" CTA (`tel:` link — safe today since `/contact` doesn't
-  exist yet) on the right.
+- **Desktop**: brand mark on the left (visible at every width), the inline nav (`desktop-nav.tsx`,
+  `xl:` and up — see "Desktop nav breakpoint" above) with an animated underline under the active item
+  (`motion`, shared `layoutId`, skipped entirely under `prefers-reduced-motion`), and a "Call us" CTA
+  (`tel:` link, visible from `sm:`) on the right.
 - **Mobile**: compact brand + a 44px icon-only menu button opening the existing shadcn `Sheet`
   (`mobile-nav.tsx`) from the right, `85vw` wide capped at `max-w-sm` (fits 320px). Focus trap,
   `Esc` to close, and body-scroll locking are inherited for free from Radix. Selecting a link closes
   the sheet via `SheetClose`.
 - **Sizing**: `h-16 sm:h-20` (bumped from `h-16 sm:h-18` during the hero-elevation pass so the header's
-  presence better matches the enlarged hero), `size="wide"` `<Container>` (matching the hero), a larger
-  brand mark/wordmark, and slightly larger/roomier nav links (`desktop-nav.tsx`) — see
-  [`docs/homepage.md`](./homepage.md#header-behavior-on-the-hero).
+  presence better matches the enlarged hero; left unchanged during the later hero-composition pass —
+  see [`docs/homepage.md`](./homepage.md#header-behavior-on-the-hero)), `size="wide"` `<Container>`
+  (matching the hero). The hero-composition pass polished proportions within that same height rather
+  than growing it further: a slightly larger brand mark/wordmark (`brand-mark.tsx`), slightly more
+  breathing room between nav links (`gap-2` in `desktop-nav.tsx`; the 15px link size itself was already
+  on-spec), and a visually "stronger" Call Us button (`shadow-subtle`/`hover:shadow-elevated` +
+  `font-semibold` at `sm:` — same height/padding as before, since that's shared with every other
+  `PrimaryButton` in the app).
 - **Positioning**: `fixed inset-x-0 top-0` (not `sticky` — changed in Phase 2.1). A `fixed` header is
   removed from normal flow so it can visually sit **on top of** the homepage hero instead of pushing
   it down. `(public)/layout.tsx`'s `<main>` compensates with `pt-16 sm:pt-20` (matching the header's
@@ -108,7 +126,8 @@ src/app/
 ├── (public)/
 │   ├── layout.tsx          # Skip link + Header + <main> (pt-16 sm:pt-20) + Footer
 │   ├── page.tsx             # Homepage: Hero + structural sections (Phase 2.1) — see docs/homepage.md
-│   ├── cars/, recently-sold/, about/, contact/  # Temporary "content in progress" shells
+│   ├── cars/, recently-sold/, finance/, warranty/, sell-your-car/, about/, contact/
+│   │                          # Temporary "content in progress" shells (`PagePlaceholder`)
 │   └── _components/         # Homepage-only section components (not routes)
 └── design-system/           # Isolated dev-only preview — deliberately outside (public)
 ```
@@ -140,10 +159,11 @@ dealership Header/Footer around it.
 
 Checked at 320 / 375 / 390 / 768 / 1024 / 1280 / 1440px:
 
-- Header never causes horizontal overflow; nav links are hidden below `md:` in favour of the mobile
-  Sheet, so the brand mark and CTA never get crushed together.
+- Header never causes horizontal overflow; nav links are hidden below `xl:` in favour of the mobile
+  Sheet, so the brand mark and CTA never get crushed together — even with 8 top-level items.
 - Mobile Sheet is `85vw` capped at `max-w-sm` — comfortably fits 320px with room either side; every
-  link/CTA inside is at least 44px tall.
+  link/CTA inside is at least 44px tall; the nav list scrolls internally (`overflow-y-auto`) so 8 items
+  never overflow the sheet itself.
 - Footer's grid is a single stacked column until `sm:` (2 columns) and `lg:` (4 columns) — contact
   details wrap naturally and never overflow their column.
 - The "Call us" CTA is hidden below `sm:` (mobile users get the same call action inside the Sheet

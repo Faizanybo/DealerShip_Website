@@ -83,7 +83,10 @@ function Header({ variant = 'auto' }: HeaderProps) {
           <BrandMark />
           <DesktopNav items={navItems} pathname={pathname} />
           <div className="flex items-center gap-3">
-            <PrimaryButton asChild className="hidden sm:inline-flex">
+            <PrimaryButton
+              asChild
+              className="shadow-subtle hover:shadow-elevated hidden transition-shadow duration-300 sm:inline-flex sm:font-semibold"
+            >
               <a href={`tel:${siteConfig.contact.phone}`}>
                 <Phone className="size-4" aria-hidden="true" />
                 Call us

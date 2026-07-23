@@ -25,9 +25,12 @@ interface MobileNavProps {
 }
 
 /**
- * Mobile menu button + panel, built on the existing shadcn `Sheet` (Radix
- * Dialog underneath) — focus trap, `Esc` to close, and body-scroll locking
- * all come for free. Closes automatically when a nav item is selected.
+ * Menu button + panel, built on the existing shadcn `Sheet` (Radix Dialog
+ * underneath) — focus trap, `Esc` to close, and body-scroll locking all
+ * come for free. Closes automatically when a nav item is selected. Visible
+ * below `xl:` — the mirror of `DesktopNav`'s `xl:flex` (see that component
+ * for why 8 top-level items need the wider threshold), and already handles
+ * any item count via `overflow-y-auto` on the nav list.
  */
 function MobileNav({ items, pathname }: MobileNavProps) {
   const [open, setOpen] = React.useState(false);
@@ -35,7 +38,7 @@ function MobileNav({ items, pathname }: MobileNavProps) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <IconButton label="Open menu" className="md:hidden">
+        <IconButton label="Open menu" className="xl:hidden">
           <Menu />
         </IconButton>
       </SheetTrigger>

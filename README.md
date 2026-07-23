@@ -4,14 +4,19 @@ A production-grade, premium automotive dealership website. This repository is th
 flagship internal project that will eventually integrate with **Auto Trader Connect APIs**
 (Stock Sync, Search, Webhooks, Valuations, etc.).
 
-> **Status:** Phase 2.1 — Homepage Hero & Public Route Scaffolding, plus a hero-elevation pass. No
-> vehicle listings, backend/Auto Trader integration, or authentication have been implemented yet. Phase
-> 2.1 added the real homepage (dark cinematic hero + structural section foundation) and temporary
-> "content in progress" shells for `/cars`, `/recently-sold`, `/about`, and `/contact` so navigation no
-> longer 404s. A follow-up pass then elevated the hero into a two-column layout with a placeholder
-> vehicle image, richer layered background/motion, and a matching Header size bump — see
-> [`docs/homepage.md`](./docs/homepage.md) — on top of the Phase 1.4 application shell and Phase 1.3
-> design system.
+> **Status:** Phase 2.1 — Homepage Hero & Public Route Scaffolding, plus a hero-elevation pass, an
+> information-architecture expansion, and a hero-composition & typography pass. No vehicle listings,
+> backend/Auto Trader integration, or authentication have been implemented yet. Phase 2.1 added the
+> real homepage (dark cinematic hero + structural section foundation) and temporary
+> "content in progress" shells so navigation no longer 404s. A follow-up pass elevated the hero into a
+> two-column layout with a placeholder vehicle image, richer layered background/motion, and a matching
+> Header size bump. Navigation was then expanded to `Home`, `Cars`, `Recently Sold`, `Finance`,
+> `Warranty`, `Sell Your Car`, `About`, `Contact` based on researched premium-dealership information
+> architecture (see [`docs/research/`](./docs/research/README.md)). Most recently, the hero composition
+> was widened to a ~44/56 two-column split with a bigger cinematic headline, the floating
+> "Featured vehicle" card was permanently removed in favour of an integrated caption, and the display
+> typeface changed to `Manrope` (see [`docs/homepage.md`](./docs/homepage.md)) — on top of the Phase
+> 1.4 application shell and Phase 1.3 design system.
 
 ---
 
@@ -115,7 +120,8 @@ The Next.js app always runs on the host via `pnpm dev` — only PostgreSQL runs 
 │   │   ├── (public)/          # Public route group: skip link + Header + <main> + Footer
 │   │   │   ├── page.tsx           # Homepage: Hero + structural sections
 │   │   │   ├── _components/       # Homepage-only section components (not routes)
-│   │   │   └── cars/, recently-sold/, about/, contact/  # Temporary "content in progress" shells
+│   │   │   └── cars/, recently-sold/, finance/, warranty/, sell-your-car/, about/, contact/
+│   │   │       # Temporary "content in progress" shells
 │   │   └── design-system/    # Temporary internal design-system preview route (remove before prod)
 │   ├── components/
 │   │   ├── ui/              # shadcn/ui primitives + typography + project button/badge/form wrappers
@@ -281,7 +287,8 @@ reserve `db:reset` for when you deliberately want a clean slate.
 
 Phase 1.3 introduced the design-system foundation: shadcn/ui primitives (`Button`, `Input`,
 `Textarea`, `Badge`, `Separator`, `Sheet`, `Dialog`, `Skeleton`), colour/spacing/shape/motion design
-tokens, a typography system (`Geist` + optional `Bricolage Grotesque` display face), layout
+tokens, a typography system (`Geist` for body/nav/metadata/buttons + `Manrope` for display headings —
+swapped from an initial `Bricolage Grotesque` during the hero-composition pass), layout
 primitives (`PageShell`, `Container`, `Section`, `SectionHeader`), project-specific component
 wrappers (`PrimaryButton`, `SecondaryButton`, `GhostButton`, `IconButton`, `StatusBadge`,
 `FormField`, `EmptyState`, `LoadingCard`), and a small optional motion-utilities module
@@ -318,8 +325,10 @@ Full reference: [`docs/application-shell.md`](./docs/application-shell.md).
 Phase 2.1 built the real homepage: a dark cinematic `Hero` with animated headline/CTAs, and a
 structural foundation of lightweight sections below it (value proposition, two inventory placeholders,
 an "about us" teaser, and a closing contact CTA) that will become data-driven once vehicle data exists.
-`Cars`, `Recently Sold`, `About`, and `Contact` now render temporary "content in progress" shells
-(`PagePlaceholder`) instead of 404ing.
+`Cars`, `Recently Sold`, `Finance`, `Warranty`, `Sell Your Car`, `About`, and `Contact` now render
+temporary "content in progress" shells (`PagePlaceholder`) instead of 404ing — the expanded set matches
+premium-dealership information architecture researched in
+[`docs/research/seymour-pope-analysis.md`](./docs/research/seymour-pope-analysis.md).
 
 A follow-up hero-elevation pass then reworked the hero itself: a responsive two-column layout (copy
 left, vehicle visual right on `lg:` and up) inside a wider `<Container size="wide">`, a generated
@@ -327,6 +336,13 @@ placeholder vehicle image (`HeroVehicle` — brandless, no real dealership photo
 `docs/homepage.md`) with slow floating motion and a floating "Featured vehicle" info card, a richer
 layered CSS/SVG background, a multi-line staggered headline animation, premium CTA hover/elevation, a
 minimal placeholder trust strip, and a smoother, bottom-pinned scroll indicator.
+
+A later hero-composition pass widened the split to ~44/56, capped the hero container at 1504px,
+enlarged the headline (now two naturally-wrapping lines, `Premium Vehicles, Honestly Presented.`),
+**permanently removed the floating "Featured vehicle" card** in favour of a plain integrated caption
+above the vehicle image, added a radial edge fade + restrained bronze rim light so the image has no
+visible rectangular boundary, refreshed the CTA copy (`Browse Inventory` / `Contact Sales`), and
+polished the Header's brand mark/nav spacing/Call Us button to match the larger hero.
 
 Full reference: [`docs/homepage.md`](./docs/homepage.md).
 
@@ -343,16 +359,23 @@ Full reference: [`docs/homepage.md`](./docs/homepage.md).
    responsive Header/Footer, public vs. admin layout boundary.
 5. **Phase 2.1 — Homepage hero & public route scaffolding** _(done)_: real homepage
    (hero + structural sections), temporary shells for the remaining public routes.
-6. **Hero elevation pass** _(this phase)_: two-column hero layout, placeholder vehicle image + motion,
+6. **Hero elevation pass** _(done)_: two-column hero layout, placeholder vehicle image + motion,
    layered background, premium CTA/scroll-indicator polish, matching Header size bump.
-7. **Phase 1.5 — Authentication**: session/auth strategy for staff and customer accounts.
-8. **Phase 2.2+ — Vehicle Listings**: search, filtering, and listing detail pages, backed by
-   PostgreSQL once vehicle data is synced from Auto Trader Connect.
-9. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations.
-10. **Phase 4 — Admin Dashboard**: internal tooling for dealership staff (own layout — see
+7. **Information architecture expansion** _(done)_: competitor IA research (`docs/research/`),
+   navigation expanded to `Finance`/`Warranty`/`Sell Your Car`, matching placeholder routes.
+8. **Hero composition & typography pass** _(this phase)_: wider ~44/56 two-column hero, `Manrope`
+   display font, floating "Featured vehicle" card permanently removed, refreshed CTA copy, Header
+   proportions polished to match.
+9. **Phase 1.5 — Authentication**: session/auth strategy for staff and customer accounts.
+10. **Phase 2.2+ — Vehicle Listings**: search, filtering, and listing detail pages, backed by
+    PostgreSQL once vehicle data is synced from Auto Trader Connect — see
+    [`docs/research/autotrader-planned-integration.md`](./docs/research/autotrader-planned-integration.md).
+11. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations. Requires
+    the official Auto Trader API documentation before any implementation begins.
+12. **Phase 4 — Admin Dashboard**: internal tooling for dealership staff (own layout — see
     [`docs/application-shell.md`](./docs/application-shell.md) → "Public vs. future admin layout boundary").
-11. **Phase 5 — Analytics, logging, and observability**.
-12. **Phase 6 — Testing strategy and CI/CD pipelines**.
+13. **Phase 5 — Analytics, logging, and observability**.
+14. **Phase 6 — Testing strategy and CI/CD pipelines**.
 
 ---
 
