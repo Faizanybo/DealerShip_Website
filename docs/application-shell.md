@@ -1,9 +1,11 @@
 # Application Shell & Navigation (Phase 1.4)
 
 Foundation-only. This documents the site configuration, navigation model, Header/Footer, and the
-public/admin layout boundary introduced in Phase 1.4. It does **not** cover the homepage, vehicle
-pages, or any business content — those are later phases. See also
-[`docs/design-system.md`](./design-system.md) for tokens/typography/motion this shell builds on.
+public/admin layout boundary introduced in Phase 1.4 (with a Phase 2.1 update to the Header's
+positioning/variant — see the "Positioning" and "Scroll behavior / variant" notes below). It does
+**not** cover vehicle pages or backend/Auto Trader integration — those are later phases. See also
+[`docs/design-system.md`](./design-system.md) for tokens/typography/motion this shell builds on, and
+[`docs/homepage.md`](./homepage.md) for the homepage hero that now uses the Header's `auto` variant.
 
 ## Site configuration (`src/config/site.ts`)
 
@@ -61,13 +63,20 @@ kept as small and focused as possible; it is not the whole app.
   (`mobile-nav.tsx`) from the right, `85vw` wide capped at `max-w-sm` (fits 320px). Focus trap,
   `Esc` to close, and body-scroll locking are inherited for free from Radix. Selecting a link closes
   the sheet via `SheetClose`.
-- **Scroll behavior**: `variant="solid"` (used by the public layout, the only variant wired up
-  today) is always a solid light background — safe for every page, since no hero page exists yet.
-  The component also supports `variant="transparent"`, for a future page with a dark hero: it
-  renders transparent with light (`hero-foreground`) text at the very top of the page, then
-  converges to the same solid look once scrolled — detected via a single `IntersectionObserver`
-  against a 1px sentinel (**no scroll-event listener**). A future hero page can render
-  `<Header variant="transparent" />` directly instead of relying on the shared layout's default.
+- **Positioning**: `fixed inset-x-0 top-0` (not `sticky` — changed in Phase 2.1). A `fixed` header is
+  removed from normal flow so it can visually sit **on top of** the homepage hero instead of pushing
+  it down. `(public)/layout.tsx`'s `<main>` compensates with `pt-16 sm:pt-18` (matching the header's
+  `h-16 sm:h-18`) so every other page's content still starts below the header exactly as before;
+  `Hero` (see [`docs/homepage.md`](./homepage.md)) cancels that same padding with a matching
+  `-mt-16 sm:-mt-18` so it alone can bleed up to the very top of the page.
+- **Scroll behavior / variant**: `variant` is `'solid' | 'transparent' | 'auto'` (default `'auto'`).
+  `'auto'` renders `'transparent'` on the homepage (`pathname === '/'`, the only route with a dark
+  hero right now) and `'solid'` everywhere else — call sites never have to think about it, and
+  `(public)/layout.tsx` just renders `<Header />` unconditionally for every page. `'transparent'`
+  renders see-through with light (`hero-foreground`) text at the very top of the page, then converges
+  to the same solid look once scrolled — detected via a single `IntersectionObserver` against a 1px
+  sentinel (**no scroll-event listener**). Extend the `pathname === '/'` check inside `Header` if a
+  future route also grows a dark hero.
 
 ## Brand mark (`src/components/layout/brand-mark.tsx`)
 
@@ -92,8 +101,10 @@ links.
 src/app/
 ├── layout.tsx            # Root: <html>/<body>, fonts, global metadata — NO Header/Footer
 ├── (public)/
-│   ├── layout.tsx          # Skip link + Header + <main> + Footer
-│   └── page.tsx             # (placeholder create-next-app content, relocated as-is)
+│   ├── layout.tsx          # Skip link + Header + <main> (pt-16 sm:pt-18) + Footer
+│   ├── page.tsx             # Homepage: Hero + structural sections (Phase 2.1) — see docs/homepage.md
+│   ├── cars/, recently-sold/, about/, contact/  # Temporary "content in progress" shells
+│   └── _components/         # Homepage-only section components (not routes)
 └── design-system/           # Isolated dev-only preview — deliberately outside (public)
 ```
 

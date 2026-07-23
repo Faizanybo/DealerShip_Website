@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Bricolage_Grotesque, Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
+import { siteConfig } from '@/config/site';
+
 /**
  * Typography system (Phase 1.3):
  * - `Geist` — body/interface sans. Clean, restrained, highly legible at UI
@@ -29,9 +31,19 @@ const geistMono = Geist_Mono({
   display: 'swap',
 });
 
+/**
+ * Base metadata for every route. `title.default` is used as-is on pages that
+ * don't set their own `title` (currently only the homepage); every other
+ * page's `title` is composed through `title.template`. All values come from
+ * `siteConfig` — the single source of truth to update once the client
+ * confirms official branding (see `docs/application-shell.md`).
+ */
 export const metadata: Metadata = {
-  title: 'AutoTrader Dealership Platform',
-  description: 'Premium automotive dealership platform — internal development build.',
+  title: {
+    default: siteConfig.dealershipName,
+    template: `%s | ${siteConfig.dealershipName}`,
+  },
+  description: siteConfig.tagline,
 };
 
 export default function RootLayout({

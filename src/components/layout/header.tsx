@@ -15,22 +15,28 @@ import { MobileNav } from './mobile-nav';
 
 interface HeaderProps {
   /**
-   * `solid` (default) — always a solid light background; safe on every
-   * page, including ones with no hero. `transparent` — see-through with
-   * light text at the very top of the page (for sitting over a dark hero),
-   * then converges to the same solid look once the user scrolls. No hero
-   * page exists yet in this phase; this prop exists so a future one can opt
-   * in without changing the Header itself.
+   * `solid` — always a solid light background; safe on every page,
+   * including ones with no hero. `transparent` — see-through with light
+   * text at the very top of the page (for sitting over a dark hero), then
+   * converges to the same solid look once the user scrolls. `auto`
+   * (default) — picks `transparent` on the homepage (the only route with a
+   * hero right now) and `solid` everywhere else, so call sites never have
+   * to think about it. Extend the `pathname === '/'` check below if a
+   * future route also grows a dark hero.
    */
-  variant?: 'solid' | 'transparent';
+  variant?: 'solid' | 'transparent' | 'auto';
 }
 
 /**
- * Sticky site header. Detects "at the top of the page" via a 1px
- * `IntersectionObserver` sentinel (no scroll-event listener), so the only
- * client-side cost is a single cheap observer callback.
+ * Fixed site header (removed from normal flow so a `transparent`/`auto`
+ * homepage variant can visually sit on top of the hero instead of pushing
+ * it down — see the matching `-mt-16 sm:-mt-18` pull-up on `Hero` and the
+ * compensating `pt-16 sm:pt-18` on `(public)/layout.tsx`'s `<main>`).
+ * Detects "at the top of the page" via a 1px `IntersectionObserver`
+ * sentinel (no scroll-event listener), so the only client-side cost is a
+ * single cheap observer callback.
  */
-function Header({ variant = 'solid' }: HeaderProps) {
+function Header({ variant = 'auto' }: HeaderProps) {
   const pathname = usePathname();
   const navItems = React.useMemo(() => getVisibleNavItems(siteConfig.navigation.primary), []);
 
@@ -52,7 +58,8 @@ function Header({ variant = 'solid' }: HeaderProps) {
     return () => observer.disconnect();
   }, []);
 
-  const isTransparent = variant === 'transparent' && isAtTop;
+  const wantsTransparent = variant === 'transparent' || (variant === 'auto' && pathname === '/');
+  const isTransparent = wantsTransparent && isAtTop;
 
   return (
     <>
@@ -65,7 +72,7 @@ function Header({ variant = 'solid' }: HeaderProps) {
 
       <header
         className={cn(
-          'sticky top-0 z-40 w-full transition-[background-color,border-color,box-shadow,color] duration-300 ease-out',
+          'fixed inset-x-0 top-0 z-40 w-full transition-[background-color,border-color,box-shadow,color] duration-300 ease-out',
           isTransparent
             ? 'text-hero-foreground border-b border-transparent bg-transparent'
             : 'border-border-subtle bg-surface-page text-foreground shadow-subtle border-b',

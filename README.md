@@ -4,10 +4,11 @@ A production-grade, premium automotive dealership website. This repository is th
 flagship internal project that will eventually integrate with **Auto Trader Connect APIs**
 (Stock Sync, Search, Webhooks, Valuations, etc.).
 
-> **Status:** Phase 1.4 — Application Shell & Navigation. No homepage, vehicle pages, Auto Trader
-> integrations, or authentication have been implemented yet. This phase adds the responsive
-> Header/Footer application shell, centralized site/navigation configuration, and the public vs.
-> future admin layout boundary, on top of the Phase 1.3 design system.
+> **Status:** Phase 2.1 — Homepage Hero & Public Route Scaffolding. No vehicle listings, backend/Auto
+> Trader integration, or authentication have been implemented yet. This phase adds the real homepage
+> (dark cinematic hero + structural section foundation) and temporary "content in progress" shells for
+> `/cars`, `/recently-sold`, `/about`, and `/contact` so navigation no longer 404s, on top of the
+> Phase 1.4 application shell and Phase 1.3 design system.
 
 ---
 
@@ -107,12 +108,15 @@ The Next.js app always runs on the host via `pnpm dev` — only PostgreSQL runs 
 ├── src/
 │   ├── app/                # Next.js App Router routes, layouts, and pages
 │   │   ├── globals.css       # Design tokens (colour/spacing/shape/motion) + Tailwind theme mapping
-│   │   ├── layout.tsx         # Root layout — <html>/<body>, fonts. No Header/Footer (shell-agnostic)
+│   │   ├── layout.tsx         # Root layout — <html>/<body>, fonts, siteConfig-based metadata
 │   │   ├── (public)/          # Public route group: skip link + Header + <main> + Footer
+│   │   │   ├── page.tsx           # Homepage: Hero + structural sections
+│   │   │   ├── _components/       # Homepage-only section components (not routes)
+│   │   │   └── cars/, recently-sold/, about/, contact/  # Temporary "content in progress" shells
 │   │   └── design-system/    # Temporary internal design-system preview route (remove before prod)
 │   ├── components/
 │   │   ├── ui/              # shadcn/ui primitives + typography + project button/badge/form wrappers
-│   │   └── layout/          # PageShell/Container/Section/SectionHeader + Header/Footer/BrandMark/nav
+│   │   └── layout/          # PageShell/Container/Section/SectionHeader + Header/Footer/Hero/BrandMark/nav
 │   ├── config/              # Centralized, typed app configuration & env parsing (site.ts, navigation.ts)
 │   ├── features/            # Feature/domain modules (vehicle-listings, admin-dashboard, auth)
 │   ├── hooks/               # Shared, cross-feature React hooks
@@ -294,16 +298,27 @@ pnpm dev
 ## Application Shell
 
 Phase 1.4 introduced the responsive application shell: a typed site configuration
-(`src/config/site.ts`) and navigation model (`src/config/navigation.ts`), a sticky responsive
-`Header` (desktop nav + shadcn `Sheet`-based mobile menu), a premium dark `Footer`, a temporary
-text-based `BrandMark`, and a `(public)` route group layout (skip link + Header + `<main>` +
-Footer) kept separate from the root layout so a future admin shell won't inherit it.
+(`src/config/site.ts`) and navigation model (`src/config/navigation.ts`), a responsive `Header`
+(desktop nav + shadcn `Sheet`-based mobile menu), a premium dark `Footer`, a temporary text-based
+`BrandMark`, and a `(public)` route group layout (skip link + Header + `<main>` + Footer) kept
+separate from the root layout so a future admin shell won't inherit it. Phase 2.1 changed `Header` to
+`fixed` positioning with a new `variant="auto"` default (transparent over the homepage hero, solid
+everywhere else) — see the next section.
 
 Full reference: [`docs/application-shell.md`](./docs/application-shell.md).
 
-Only the `/` home route (still the unmodified `create-next-app` placeholder, just relocated) exists
-today — `Cars`, `Recently Sold`, `About`, and `Contact` are configured in the nav as planned routes
-and will 404 until their pages are built in later phases.
+---
+
+## Homepage
+
+Phase 2.1 built the real homepage: a dark cinematic `Hero` (CSS/SVG background treatment — no photo
+asset was available, see `docs/homepage.md` for the asset strategy and what to swap in later) with
+animated headline/CTAs, and a structural foundation of lightweight sections below it (value
+proposition, two inventory placeholders, an "about us" teaser, and a closing contact CTA) that will
+become data-driven once vehicle data exists. `Cars`, `Recently Sold`, `About`, and `Contact` now
+render temporary "content in progress" shells (`PagePlaceholder`) instead of 404ing.
+
+Full reference: [`docs/homepage.md`](./docs/homepage.md).
 
 ---
 
@@ -314,15 +329,18 @@ and will 404 until their pages are built in later phases.
    and client setup, migration + connectivity verification. No domain schema yet.
 3. **Phase 1.3 — Design system** _(done)_: shadcn/ui integration, design tokens, typography,
    layout primitives, reusable UI wrappers, motion utilities, `/design-system` preview.
-4. **Phase 1.4 — Application shell & navigation** _(this phase)_: site/navigation configuration,
+4. **Phase 1.4 — Application shell & navigation** _(done)_: site/navigation configuration,
    responsive Header/Footer, public vs. admin layout boundary.
-5. **Phase 1.5 — Authentication**: session/auth strategy for staff and customer accounts.
-6. **Phase 2 — Vehicle Listings**: search, filtering, and listing detail pages.
-7. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations.
-8. **Phase 4 — Admin Dashboard**: internal tooling for dealership staff (own layout — see
+5. **Phase 2.1 — Homepage hero & public route scaffolding** _(this phase)_: real homepage
+   (hero + structural sections), temporary shells for the remaining public routes.
+6. **Phase 1.5 — Authentication**: session/auth strategy for staff and customer accounts.
+7. **Phase 2.2+ — Vehicle Listings**: search, filtering, and listing detail pages, backed by
+   PostgreSQL once vehicle data is synced from Auto Trader Connect.
+8. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations.
+9. **Phase 4 — Admin Dashboard**: internal tooling for dealership staff (own layout — see
    [`docs/application-shell.md`](./docs/application-shell.md) → "Public vs. future admin layout boundary").
-9. **Phase 5 — Analytics, logging, and observability**.
-10. **Phase 6 — Testing strategy and CI/CD pipelines**.
+10. **Phase 5 — Analytics, logging, and observability**.
+11. **Phase 6 — Testing strategy and CI/CD pipelines**.
 
 ---
 
