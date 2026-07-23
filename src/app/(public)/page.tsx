@@ -35,8 +35,6 @@ export default function HomePage() {
         secondaryCta={{ label: 'Contact Sales', href: '/contact' }}
         // Neutral placeholders — replace with client-confirmed copy before launch.
         trustItems={['Carefully inspected vehicles', 'Transparent pricing', 'Flexible finance']}
-        // Static for now — see `hero-vehicle.tsx` for why it isn't animated yet.
-        featuredLabel="Featured Vehicle"
         scrollTargetId="intro"
       />
 

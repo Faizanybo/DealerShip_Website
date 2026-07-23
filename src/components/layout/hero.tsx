@@ -13,8 +13,6 @@ interface HeroProps {
   secondaryCta: HeroCta;
   /** Short, neutral placeholder trust points — see `HeroContent` for the "replace before launch" note. */
   trustItems: string[];
-  /** Static caption above the vehicle visual — see `HeroVehicle` for why it isn't animated yet. */
-  featuredLabel: string;
   /** Section id on the page below to scroll to — renders a scroll indicator when set. */
   scrollTargetId?: string;
 }
@@ -48,7 +46,6 @@ function Hero({
   primaryCta,
   secondaryCta,
   trustItems,
-  featuredLabel,
   scrollTargetId,
 }: HeroProps) {
   return (
@@ -73,7 +70,7 @@ function Hero({
             secondaryCta={secondaryCta}
             trustItems={trustItems}
           />
-          <HeroVehicle label={featuredLabel} />
+          <HeroVehicle />
         </div>
       </Container>
 

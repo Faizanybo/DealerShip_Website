@@ -1,13 +1,15 @@
-# Homepage & Public Route Scaffolding (Phase 2.1 + Hero Elevation + Hero Composition)
+# Homepage & Public Route Scaffolding (Phase 2.1 + Hero Elevation + Hero Composition + Intro Motion)
 
 Foundation-only. This documents the homepage hero, the homepage's structural section foundation, and
 the temporary "content in progress" shells for the other public routes introduced in Phase 2.1, the
-hero-elevation pass (two-column layout, placeholder vehicle image, richer motion), and the later
-hero-composition pass (wider two-column split, Manrope display font, removed floating card,
-integrated featured-vehicle label). It does **not** cover vehicle listings, filtering, or any
-backend/Auto Trader integration — those are later phases. See also
-[`docs/design-system.md`](./design-system.md) (tokens/typography/motion) and
-[`docs/application-shell.md`](./application-shell.md) (Header/Footer/navigation).
+hero-elevation pass (two-column layout, placeholder vehicle image, richer motion), the hero-composition
+pass (wider two-column split, Manrope display font, removed floating card), and the later
+featured-vehicle intro pass (one-time animated "OUR FEATURE VEHICLE" text before the vehicle reveals —
+timing/state-machine detail lives in [`docs/motion-guidelines.md`](./motion-guidelines.md), not
+repeated here). It does **not** cover vehicle listings, filtering, or any backend/Auto Trader
+integration — those are later phases. See also [`docs/design-system.md`](./design-system.md)
+(tokens/typography/motion) and [`docs/application-shell.md`](./application-shell.md)
+(Header/Footer/navigation).
 
 ## Route status
 
@@ -42,9 +44,14 @@ Split into four pieces so only small, focused subtrees ship client JS:
   and the trust strip, animated in with a staggered fade-up (`useMotionVariants('staggerContainer')` /
   `'fadeUp'` from `src/lib/motion`, both reduced-motion-safe).
 - **`HeroVehicle`** (`hero-vehicle.tsx`, Client Component) — the placeholder vehicle image, its slow
-  floating motion, and a static "Featured Vehicle" caption above it. Isolated from `HeroContent` so the
-  two animate independently without re-rendering each other. There is **no floating info card** here
+  floating motion, its ambient spotlight/rim-light/floor-reflection glows, and (until it completes) the
+  one-time `FeaturedVehicleIntro` text sequence overlaid in the same box. Isolated from `HeroContent` so
+  the two animate independently without re-rendering each other. There is **no floating info card** here
   (see "Removed: floating vehicle card" below).
+- **`FeaturedVehicleIntro`** (`featured-vehicle-intro.tsx`, Client Component) — the one-time
+  character-by-character "OUR FEATURE VEHICLE" intro that plays before the vehicle reveals. Full
+  detail — stages, timing, reduced-motion behavior — lives in
+  [`docs/motion-guidelines.md`](./motion-guidelines.md) rather than duplicated here.
 - **`HeroScrollIndicator`** (`hero-scroll-indicator.tsx`, Client Component) — the looping scroll cue,
   positioned `absolute` on the section itself (not inside either column) so it stays pinned to the
   hero's bottom edge regardless of how tall the copy or the vehicle visual end up being.
@@ -83,12 +90,20 @@ must be replaced with client-supplied photography before production. It's render
 (`fill`, `priority` since it's an above-the-fold LCP candidate, explicit `sizes`), `object-contain`, a
 soft `drop-shadow`, and a **radial** (not just bottom) mask-image gradient so every edge — not only the
 bottom — fades into the hero background rather than ending in a hard rectangular edge. A slow (`8s`,
-looping) vertical float is layered on top — `prefers-reduced-motion` disables it entirely, leaving the
-image static. A second, tighter blurred glow (bronze, low opacity) sits along the vehicle's upper edge
-as a restrained "rim light", distinct from the broader ambient glow behind it.
+looping) vertical float starts once the vehicle reveals — `prefers-reduced-motion` disables it entirely,
+leaving the image static. A restrained bronze rim light and a soft floor reflection reveal alongside it
+with a slight stagger (see `docs/motion-guidelines.md`).
 
-Above the image sits a short, static "Featured Vehicle" caption (`font-display`, uppercase, wide
-letter-spacing, a bronze-to-muted gradient via `background-clip: text`) — plain typography, not a card.
+### Text/image handoff — an overlay, not a stacked block
+
+The `FeaturedVehicleIntro` text and the vehicle image both live **absolutely positioned inside the same
+fixed `aspect-[4/3]` box**, not stacked in a flex column. That's a deliberate choice, not an
+accident: swapping one for the other (once the intro finishes) never changes that box's height, so the
+hero never shifts — on any viewport. The `<Image>` itself is mounted from the very first render (so
+`priority` can actually start preloading it while the text plays) and simply starts at `opacity: 0`,
+revealing via `hero-vehicle.tsx`'s `vehicleVariants` once the intro's `onIntroComplete` fires — no
+fetch/decode delay right when it needs to appear. Full stage/timing detail:
+[`docs/motion-guidelines.md`](./motion-guidelines.md).
 
 ### Removed: floating vehicle card
 
@@ -96,8 +111,9 @@ An earlier pass had a bordered "Featured vehicle" info card (icon + two lines of
 bottom-left of the vehicle image. It was **permanently removed** during the hero-composition pass — the
 brief was explicit that the visual should read as one integrated scene, not a photo with a UI card
 bolted onto it. Its component markup, the `Sparkles` icon import, and its dedicated entrance-animation
-values were all deleted from `hero-vehicle.tsx`, not just hidden. It was not replaced with another card
-— the "Featured Vehicle" caption above the image is plain text, with no background, border, or icon.
+values were all deleted from `hero-vehicle.tsx`, not just hidden. It has not been reintroduced since —
+the `FeaturedVehicleIntro` text that later replaced it is plain typography with no background, border,
+or icon.
 
 ### Layered background (`HeroBackground` inside `hero.tsx`)
 
@@ -153,10 +169,11 @@ before launch. No claims about actual inspection processes, pricing, or finance 
 - The hero vehicle image has a short, honest `alt="Premium vehicle"` — it is a real (if generic)
   vehicle image, not a purely decorative texture, so it isn't `alt=""`.
 - The trust-strip icons are `aria-hidden`; their adjacent text remains visible to assistive tech.
-- All hero motion (headline stagger, vehicle float, featured-vehicle caption fade, scroll indicator
-  dot) is reduced-motion-safe — see `useReducedMotion`/`useMotionVariants` usage in each component. The
-  featured-vehicle caption is currently a simple whole-string fade (no character-by-character reveal —
-  that's a deliberately separate, later piece of work).
+- The `FeaturedVehicleIntro` phrase is exposed once, in full, via a `sr-only` span; the animated
+  character spans sit in a separately marked `aria-hidden="true"` container — see
+  [`docs/motion-guidelines.md`](./motion-guidelines.md) for the full accessibility rationale.
+- All hero motion (headline stagger, vehicle float/reveal, featured-vehicle intro, scroll indicator
+  dot) is reduced-motion-safe — see `useReducedMotion` usage in each component.
 
 ## Homepage structural foundation (`src/app/(public)/_components/`)
 

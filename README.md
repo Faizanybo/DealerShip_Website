@@ -5,18 +5,19 @@ flagship internal project that will eventually integrate with **Auto Trader Conn
 (Stock Sync, Search, Webhooks, Valuations, etc.).
 
 > **Status:** Phase 2.1 — Homepage Hero & Public Route Scaffolding, plus a hero-elevation pass, an
-> information-architecture expansion, and a hero-composition & typography pass. No vehicle listings,
-> backend/Auto Trader integration, or authentication have been implemented yet. Phase 2.1 added the
-> real homepage (dark cinematic hero + structural section foundation) and temporary
-> "content in progress" shells so navigation no longer 404s. A follow-up pass elevated the hero into a
-> two-column layout with a placeholder vehicle image, richer layered background/motion, and a matching
-> Header size bump. Navigation was then expanded to `Home`, `Cars`, `Recently Sold`, `Finance`,
-> `Warranty`, `Sell Your Car`, `About`, `Contact` based on researched premium-dealership information
-> architecture (see [`docs/research/`](./docs/research/README.md)). Most recently, the hero composition
-> was widened to a ~44/56 two-column split with a bigger cinematic headline, the floating
-> "Featured vehicle" card was permanently removed in favour of an integrated caption, and the display
-> typeface changed to `Manrope` (see [`docs/homepage.md`](./docs/homepage.md)) — on top of the Phase
-> 1.4 application shell and Phase 1.3 design system.
+> information-architecture expansion, a hero-composition & typography pass, and a featured-vehicle
+> intro-motion pass. No vehicle listings, backend/Auto Trader integration, or authentication have been
+> implemented yet. Phase 2.1 added the real homepage (dark cinematic hero + structural section
+> foundation) and temporary "content in progress" shells so navigation no longer 404s. A follow-up pass
+> elevated the hero into a two-column layout with a placeholder vehicle image, richer layered
+> background/motion, and a matching Header size bump. Navigation was then expanded to `Home`, `Cars`,
+> `Recently Sold`, `Finance`, `Warranty`, `Sell Your Car`, `About`, `Contact` based on researched
+> premium-dealership information architecture (see [`docs/research/`](./docs/research/README.md)). The
+> hero composition was then widened to a ~44/56 two-column split with a bigger cinematic headline, the
+> floating "Featured vehicle" card was permanently removed, and the display typeface changed to
+> `Manrope`. Most recently, a one-time animated "OUR FEATURE VEHICLE" character intro was added before
+> the vehicle reveal (see [`docs/motion-guidelines.md`](./docs/motion-guidelines.md)) — on top of the
+> Phase 1.4 application shell and Phase 1.3 design system.
 
 ---
 
@@ -339,10 +340,16 @@ minimal placeholder trust strip, and a smoother, bottom-pinned scroll indicator.
 
 A later hero-composition pass widened the split to ~44/56, capped the hero container at 1504px,
 enlarged the headline (now two naturally-wrapping lines, `Premium Vehicles, Honestly Presented.`),
-**permanently removed the floating "Featured vehicle" card** in favour of a plain integrated caption
-above the vehicle image, added a radial edge fade + restrained bronze rim light so the image has no
-visible rectangular boundary, refreshed the CTA copy (`Browse Inventory` / `Contact Sales`), and
-polished the Header's brand mark/nav spacing/Call Us button to match the larger hero.
+**permanently removed the floating "Featured vehicle" card**, added a radial edge fade + restrained
+bronze rim light so the image has no visible rectangular boundary, refreshed the CTA copy
+(`Browse Inventory` / `Contact Sales`), and polished the Header's brand mark/nav spacing/Call Us button
+to match the larger hero.
+
+Most recently, a featured-vehicle intro-motion pass added a short, one-time, character-by-character
+"OUR FEATURE VEHICLE" text animation (`FeaturedVehicleIntro`) that plays inside the vehicle's own visual
+area before it reveals — the text and image are overlaid in the same fixed-size box (not stacked), so
+nothing shifts height when one replaces the other. Fully reduced-motion-safe and runs exactly once per
+page load — see [`docs/motion-guidelines.md`](./docs/motion-guidelines.md) for the stage/timing detail.
 
 Full reference: [`docs/homepage.md`](./docs/homepage.md).
 
@@ -363,19 +370,22 @@ Full reference: [`docs/homepage.md`](./docs/homepage.md).
    layered background, premium CTA/scroll-indicator polish, matching Header size bump.
 7. **Information architecture expansion** _(done)_: competitor IA research (`docs/research/`),
    navigation expanded to `Finance`/`Warranty`/`Sell Your Car`, matching placeholder routes.
-8. **Hero composition & typography pass** _(this phase)_: wider ~44/56 two-column hero, `Manrope`
+8. **Hero composition & typography pass** _(done)_: wider ~44/56 two-column hero, `Manrope`
    display font, floating "Featured vehicle" card permanently removed, refreshed CTA copy, Header
    proportions polished to match.
-9. **Phase 1.5 — Authentication**: session/auth strategy for staff and customer accounts.
-10. **Phase 2.2+ — Vehicle Listings**: search, filtering, and listing detail pages, backed by
+9. **Featured-vehicle intro-motion pass** _(this phase)_: one-time animated "OUR FEATURE VEHICLE"
+   character intro before the vehicle reveal, overlaid in the vehicle's own box (no layout shift),
+   fully reduced-motion-safe — see [`docs/motion-guidelines.md`](./docs/motion-guidelines.md).
+10. **Phase 1.5 — Authentication**: session/auth strategy for staff and customer accounts.
+11. **Phase 2.2+ — Vehicle Listings**: search, filtering, and listing detail pages, backed by
     PostgreSQL once vehicle data is synced from Auto Trader Connect — see
     [`docs/research/autotrader-planned-integration.md`](./docs/research/autotrader-planned-integration.md).
-11. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations. Requires
+12. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations. Requires
     the official Auto Trader API documentation before any implementation begins.
-12. **Phase 4 — Admin Dashboard**: internal tooling for dealership staff (own layout — see
+13. **Phase 4 — Admin Dashboard**: internal tooling for dealership staff (own layout — see
     [`docs/application-shell.md`](./docs/application-shell.md) → "Public vs. future admin layout boundary").
-13. **Phase 5 — Analytics, logging, and observability**.
-14. **Phase 6 — Testing strategy and CI/CD pipelines**.
+14. **Phase 5 — Analytics, logging, and observability**.
+15. **Phase 6 — Testing strategy and CI/CD pipelines**.
 
 ---
 
