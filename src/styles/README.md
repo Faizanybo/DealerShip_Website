@@ -1,6 +1,9 @@
 # `styles`
 
-Home for design-token-level styling that goes beyond `app/globals.css` (e.g. Tailwind theme
-extensions, shared CSS variables) once the visual design system is introduced.
+Home for design-token-level styling that goes beyond `app/globals.css`, if/when the token set outgrows
+a single file.
 
-Intentionally empty. This folder is reserved for a future phase — do not implement yet.
+As of Phase 1.3, all design tokens (colour, spacing, shape, motion) and the typography/Tailwind theme
+mapping live directly in `src/app/globals.css` (the location shadcn/ui itself manages), which is
+simpler for a token set this size. This folder stays intentionally empty — revisit only if
+`globals.css` becomes unwieldy.

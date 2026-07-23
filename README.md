@@ -4,9 +4,10 @@ A production-grade, premium automotive dealership website. This repository is th
 flagship internal project that will eventually integrate with **Auto Trader Connect APIs**
 (Stock Sync, Search, Webhooks, Valuations, etc.).
 
-> **Status:** Phase 1.2 — Local Database Foundation. No business logic, pages, or Auto Trader
-> integrations have been implemented yet. This phase adds a local PostgreSQL + Prisma data layer on
-> top of the Phase 1.1 project foundation.
+> **Status:** Phase 1.3 — Design System Foundation. No business logic, pages, navigation, or Auto
+> Trader integrations have been implemented yet. This phase adds the shadcn/ui-based component
+> foundation, design tokens, typography, layout primitives, and motion utilities on top of the
+> Phase 1.1 project foundation and Phase 1.2 database layer.
 
 ---
 
@@ -24,11 +25,14 @@ flagship internal project that will eventually integrate with **Auto Trader Conn
 | Containerization | Docker (PostgreSQL only — the app itself is not containerized)                  |
 | Database         | PostgreSQL 16 (local, via Docker Compose)                                       |
 | ORM              | [Prisma ORM](https://www.prisma.io) 7 (`@prisma/client` + `@prisma/adapter-pg`) |
-| UI components    | shadcn/ui _(added in a later phase)_                                            |
-| Animation        | Framer Motion _(added in a later phase)_                                        |
+| UI components    | [shadcn/ui](https://ui.shadcn.com) (style `radix-nova`, Radix UI primitives)    |
+| Icons            | [lucide-react](https://lucide.dev)                                              |
+| Animation        | [Motion for React](https://motion.dev) (`motion` package)                       |
+| Variant styling  | `class-variance-authority`, `clsx`, `tailwind-merge`                            |
+| Auth             | _(added in a later phase)_                                                      |
 
-Nothing marked "later phase" is installed yet. Only foundation and data-layer dependencies are
-present so far.
+Only foundation, data-layer, and design-system dependencies are present so far — no auth, business
+logic, or Auto Trader integration packages yet.
 
 ---
 
@@ -102,14 +106,16 @@ The Next.js app always runs on the host via `pnpm dev` — only PostgreSQL runs 
 │   └── db-reset.mjs             # `pnpm db:reset` — destructive local DB reset (with confirmation)
 ├── src/
 │   ├── app/                # Next.js App Router routes, layouts, and pages
+│   │   ├── globals.css       # Design tokens (colour/spacing/shape/motion) + Tailwind theme mapping
+│   │   └── design-system/    # Temporary internal design-system preview route (remove before prod)
 │   ├── components/
-│   │   ├── ui/              # Reusable, presentation-only UI primitives
-│   │   └── layout/          # App-wide structural layout components
+│   │   ├── ui/              # shadcn/ui primitives + typography + project button/badge/form wrappers
+│   │   └── layout/          # PageShell, Container, Section, SectionHeader
 │   ├── config/              # Centralized, typed app configuration & env parsing
 │   ├── features/            # Feature/domain modules (vehicle-listings, admin-dashboard, auth)
 │   ├── hooks/               # Shared, cross-feature React hooks
 │   ├── integrations/        # Typed clients/adapters for third-party APIs (autotrader, email)
-│   ├── lib/                 # Framework-agnostic utilities (logger, analytics helpers)
+│   ├── lib/                 # Framework-agnostic utilities (logger, analytics, motion, cn() helper)
 │   ├── server/
 │   │   ├── api/               # Route Handler helpers (reserved)
 │   │   ├── auth/               # Server-side auth logic (reserved)
@@ -117,7 +123,7 @@ The Next.js app always runs on the host via `pnpm dev` — only PostgreSQL runs 
 │   │       ├── prisma.ts         # Singleton Prisma Client (server-only)
 │   │       └── generated/        # Generated Prisma Client (gitignored, `pnpm db:generate`)
 │   ├── services/            # Business/domain logic orchestrating integrations + db
-│   ├── styles/              # Design tokens & shared styling beyond globals.css
+│   ├── styles/              # Reserved for design tokens beyond globals.css (empty for now)
 │   └── types/               # Shared TypeScript types/interfaces
 ├── tests/                   # unit / integration / e2e test suites (reserved, none yet)
 └── docker-compose.yml       # Local PostgreSQL only — the Next.js app is not containerized
@@ -143,6 +149,11 @@ before adding code to a given layer.
 - **External payloads are never the internal domain model.** When Auto Trader integration lands,
   its API responses will be normalized into our own Prisma models — not persisted as-is.
 - **No business logic in `components/ui`**: primitives stay purely presentational.
+- **Design tokens over ad-hoc values**: use the semantic Tailwind utilities generated from
+  `globals.css` (`bg-surface-page`, `text-text-secondary`, `rounded-card`, `px-page-mobile`, …)
+  instead of raw hex/px values — see [`docs/design-system.md`](./docs/design-system.md).
+- **Compose, don't duplicate, shadcn/ui primitives**: project-specific components (`PrimaryButton`,
+  `StatusBadge`, `FormField`, etc.) wrap `components/ui/*` rather than re-implementing them.
 - **Naming**: `kebab-case` for folders and non-component files, `PascalCase` for React components,
   `camelCase` for variables/functions, `SCREAMING_SNAKE_CASE` for environment variable names.
 - **Imports** use the `@/*` path alias rooted at `src/` instead of deep relative paths.
@@ -253,12 +264,34 @@ reserve `db:reset` for when you deliberately want a clean slate.
 
 ---
 
+## Design System
+
+Phase 1.3 introduced the design-system foundation: shadcn/ui primitives (`Button`, `Input`,
+`Textarea`, `Badge`, `Separator`, `Sheet`, `Dialog`, `Skeleton`), colour/spacing/shape/motion design
+tokens, a typography system (`Geist` + optional `Bricolage Grotesque` display face), layout
+primitives (`PageShell`, `Container`, `Section`, `SectionHeader`), project-specific component
+wrappers (`PrimaryButton`, `SecondaryButton`, `GhostButton`, `IconButton`, `StatusBadge`,
+`FormField`, `EmptyState`, `LoadingCard`), and a small optional motion-utilities module
+(`src/lib/motion`).
+
+Full reference: [`docs/design-system.md`](./docs/design-system.md).
+
+Visual QA preview (internal, dev-only, remove/protect before production):
+
+```bash
+pnpm dev
+# then open http://localhost:3000/design-system
+```
+
+---
+
 ## Future Roadmap (High Level)
 
 1. **Phase 1.1 — Foundation** _(done)_: project scaffolding, tooling, structure.
-2. **Phase 1.2 — Local database foundation** _(this phase)_: PostgreSQL via Docker, Prisma schema
+2. **Phase 1.2 — Local database foundation** _(done)_: PostgreSQL via Docker, Prisma schema
    and client setup, migration + connectivity verification. No domain schema yet.
-3. **Phase 1.3 — Design system**: shadcn/ui integration, base design tokens, layout shell.
+3. **Phase 1.3 — Design system** _(this phase)_: shadcn/ui integration, design tokens, typography,
+   layout primitives, reusable UI wrappers, motion utilities, `/design-system` preview.
 4. **Phase 1.4 — Authentication**: session/auth strategy for staff and customer accounts.
 5. **Phase 2 — Vehicle Listings**: search, filtering, and listing detail pages.
 6. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations.

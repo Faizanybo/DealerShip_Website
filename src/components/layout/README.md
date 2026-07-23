@@ -4,3 +4,15 @@ Structural, app-wide layout building blocks (site header, footer, navigation she
 
 - Composes primitives from `components/ui`.
 - Should remain free of data fetching or business logic; layout components receive data via props.
+
+## Contents
+
+- **`page-shell.tsx`** — `PageShell`: outermost full-height flex-column scaffold for a route.
+- **`container.tsx`** — `Container`: mobile-first horizontal gutter + max-width wrapper.
+- **`section.tsx`** — `Section`: full-bleed vertical rhythm + background tone (`page` / `muted` /
+  `hero`). `tone="hero"` locally applies the `dark` scope for cinematic sections.
+- **`section-header.tsx`** — `SectionHeader`: eyebrow + title + description heading block.
+
+Header, footer, and navigation are intentionally not implemented yet (later phase).
+
+See `docs/design-system.md` for usage guidance and examples.
