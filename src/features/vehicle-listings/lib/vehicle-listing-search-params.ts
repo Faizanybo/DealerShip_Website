@@ -1,7 +1,7 @@
 import type { VehicleListingQuery, VehicleStatus } from '@/features/vehicles/vehicle.types';
 import {
   DEFAULT_VEHICLE_PAGE_SIZE,
-  MAX_VEHICLE_PAGE_SIZE,
+  VEHICLE_LISTING_PAGE_SIZE_OPTIONS,
   VEHICLE_STATUSES,
 } from '@/features/vehicles/vehicle.constants';
 import { vehicleListingQuerySchema } from '@/features/vehicles/vehicle.schemas';
@@ -17,7 +17,7 @@ export const CARS_LISTING_DEFAULTS: VehicleListingQuery = {
   status: CARS_LISTING_DEFAULT_STATUS,
   sort: 'newest',
   page: 1,
-  pageSize: MAX_VEHICLE_PAGE_SIZE,
+  pageSize: DEFAULT_VEHICLE_PAGE_SIZE,
 };
 
 export type SearchParamsInput = Record<string, string | string[] | undefined>;
@@ -54,6 +54,16 @@ function parseStatusParam(value: string | undefined): VehicleStatus | VehicleSta
   if (valid.length === 0) return undefined;
   if (valid.length === 1) return valid[0];
   return valid;
+}
+
+function normalizePageSize(pageSize: number | undefined): number {
+  if (pageSize === undefined) return DEFAULT_VEHICLE_PAGE_SIZE;
+
+  if ((VEHICLE_LISTING_PAGE_SIZE_OPTIONS as readonly number[]).includes(pageSize)) {
+    return pageSize;
+  }
+
+  return DEFAULT_VEHICLE_PAGE_SIZE;
 }
 
 function normalizePriceBounds(query: VehicleListingQuery): VehicleListingQuery {
@@ -118,7 +128,7 @@ function parseVehicleListingSearchParams(
     status: fromUrl.status ?? defaults.status,
     sort: fromUrl.sort ?? defaults.sort,
     page: fromUrl.page ?? defaults.page,
-    pageSize: fromUrl.pageSize ?? defaults.pageSize,
+    pageSize: normalizePageSize(fromUrl.pageSize ?? defaults.pageSize),
   };
 
   return normalizePriceBounds(merged);
@@ -157,11 +167,7 @@ function serializeVehicleListingSearchParams(
     params.set('page', String(query.page));
   }
 
-  if (
-    query.pageSize &&
-    query.pageSize !== (defaults.pageSize ?? DEFAULT_VEHICLE_PAGE_SIZE) &&
-    query.pageSize !== MAX_VEHICLE_PAGE_SIZE
-  ) {
+  if (query.pageSize && query.pageSize !== (defaults.pageSize ?? DEFAULT_VEHICLE_PAGE_SIZE)) {
     params.set('pageSize', String(query.pageSize));
   }
 

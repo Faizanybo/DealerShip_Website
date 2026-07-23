@@ -2,6 +2,8 @@ export { VehicleFilters } from './vehicle-filters';
 export { VehicleFilterBar } from './vehicle-filter-bar';
 export { VehicleFilterSheet } from './vehicle-filter-sheet';
 export { VehicleSortSelect } from './vehicle-sort-select';
+export { VehiclePagination } from './vehicle-pagination';
+export { VehiclePageSizeSelect } from './vehicle-page-size-select';
 export { ActiveFilterChips } from './active-filter-chips';
 export { ClearFiltersButton } from './clear-filters-button';
 export { FilterSelect } from './filter-select';

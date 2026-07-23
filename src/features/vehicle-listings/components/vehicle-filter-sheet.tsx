@@ -29,15 +29,9 @@ interface VehicleFilterSheetProps {
   filterOptions: VehicleFilterOptions;
   query: VehicleListingQuery;
   activeFilterCount: number;
-  resultCount: number;
 }
 
-function VehicleFilterSheet({
-  filterOptions,
-  query,
-  activeFilterCount,
-  resultCount,
-}: VehicleFilterSheetProps) {
+function VehicleFilterSheet({ filterOptions, query, activeFilterCount }: VehicleFilterSheetProps) {
   const { applyQuery, clearAllFilters } = useVehicleListingParams();
   const [open, setOpen] = React.useState(false);
   const [draft, setDraft] = React.useState<VehicleFilterFieldValues>(() =>
@@ -83,9 +77,7 @@ function VehicleFilterSheet({
       <SheetContent side="bottom" className="max-h-[88vh] overflow-y-auto rounded-t-2xl px-4 pb-6">
         <SheetHeader className="text-left">
           <SheetTitle>Filter vehicles</SheetTitle>
-          <SheetDescription>
-            {resultCount} {resultCount === 1 ? 'vehicle' : 'vehicles'} match your current selection
-          </SheetDescription>
+          <SheetDescription>Refine make, price, fuel type, and more.</SheetDescription>
         </SheetHeader>
 
         <div className="py-4">

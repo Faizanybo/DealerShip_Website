@@ -1,7 +1,6 @@
 import { StatusBadge } from '@/components/ui/status-badge';
 import { getVehicleStatusLabel } from '@/features/vehicles/vehicle.utils';
 import type { VehicleStatus } from '@/features/vehicles/vehicle.types';
-import { cn } from '@/lib/utils';
 
 const STATUS_VARIANT: Record<VehicleStatus, 'success' | 'warning' | 'destructive' | 'neutral'> = {
   AVAILABLE: 'success',
@@ -22,7 +21,11 @@ interface VehicleStatusBadgeProps {
  */
 function VehicleStatusBadge({ status, className }: VehicleStatusBadgeProps) {
   return (
-    <StatusBadge status={STATUS_VARIANT[status]} className={cn('shadow-subtle', className)}>
+    <StatusBadge
+      status={STATUS_VARIANT[status]}
+      presentation="overlay"
+      className={className}
+    >
       {getVehicleStatusLabel(status)}
     </StatusBadge>
   );

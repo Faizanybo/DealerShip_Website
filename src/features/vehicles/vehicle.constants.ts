@@ -42,6 +42,11 @@ export const DEFAULT_VEHICLE_PAGE_SIZE = 12;
 /** Maximum page size accepted by the mock repository. */
 export const MAX_VEHICLE_PAGE_SIZE = 48;
 
+/** User-selectable page sizes on `/cars` and future listing pages. */
+export const VEHICLE_LISTING_PAGE_SIZE_OPTIONS = [12, 24, 36] as const;
+
+export type VehicleListingPageSize = (typeof VEHICLE_LISTING_PAGE_SIZE_OPTIONS)[number];
+
 /**
  * Expected future mapping from Auto Trader lifecycle states to public status.
  * Exact API values will be confirmed against official documentation.

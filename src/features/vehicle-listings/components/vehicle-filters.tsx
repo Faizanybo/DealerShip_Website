@@ -11,14 +11,13 @@ import { VehicleSortSelect } from './vehicle-sort-select';
 interface VehicleFiltersProps {
   filterOptions: VehicleFilterOptions;
   query: VehicleListingQuery;
-  resultCount: number;
 }
 
 /**
  * Inventory filter shell — desktop toolbar + mobile sheet + sort control.
  * URL is the source of truth; all data fetching stays on the server.
  */
-function VehicleFilters({ filterOptions, query, resultCount }: VehicleFiltersProps) {
+function VehicleFilters({ filterOptions, query }: VehicleFiltersProps) {
   const chips = getActiveFilterChips(query);
   const activeFilterCount = chips.filter((chip) => chip.key !== 'sort').length;
 
@@ -30,7 +29,6 @@ function VehicleFilters({ filterOptions, query, resultCount }: VehicleFiltersPro
             filterOptions={filterOptions}
             query={query}
             activeFilterCount={activeFilterCount}
-            resultCount={resultCount}
           />
         </div>
         <VehicleSortSelect

@@ -1,8 +1,8 @@
 # `features/vehicle-listings`
 
-Vehicle inventory browsing: URL-driven search, filtering, sorting, and listing UI.
+Vehicle inventory browsing: URL-driven search, filtering, sorting, pagination, and listing UI.
 
-**Phase 2.2.4** adds filters and sort for [`/cars`](../../../docs/pages/cars-listing.md). Pagination UI is deferred to 2.2.5; the URL contract already supports `page` and `pageSize`.
+**Phase 2.2.5** adds pagination and page-size controls for [`/cars`](../../../docs/pages/cars-listing.md).
 
 Listing pages consume `@/services/vehicle.service` — see [`docs/vehicle-domain.md`](../../../docs/vehicle-domain.md).
 
@@ -12,8 +12,10 @@ Listing pages consume `@/services/vehicle.service` — see [`docs/vehicle-domain
 import {
   parseVehicleListingSearchParams,
   VehicleFilters,
+  VehiclePagination,
+  VehiclePageSizeSelect,
   useVehicleListingParams,
 } from '@/features/vehicle-listings';
 ```
 
-Server pages parse `searchParams`; client components update the URL via `useVehicleListingParams`.
+Server pages parse `searchParams`; client components update the URL via `useVehicleListingParams` (`goToPage`, `setPageSize`, filter helpers).

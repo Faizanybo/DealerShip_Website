@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
  * real label (e.g. "In stock", "Pending"), not just a colour name.
  */
 const statusBadgeVariants = cva(
-  'inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-transparent px-2.5 py-1 text-xs font-medium whitespace-nowrap',
+  'inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium whitespace-nowrap',
   {
     variants: {
       status: {
@@ -20,9 +20,15 @@ const statusBadgeVariants = cva(
         destructive: 'bg-status-destructive/10 text-status-destructive',
         neutral: 'bg-secondary text-secondary-foreground',
       },
+      presentation: {
+        default: 'border-transparent',
+        /** Readable on dark photography — used on vehicle card image overlays. */
+        overlay: 'border-white/20 bg-black/72 text-white shadow-elevated backdrop-blur-sm',
+      },
     },
     defaultVariants: {
       status: 'neutral',
+      presentation: 'default',
     },
   },
 );
@@ -34,6 +40,13 @@ const dotColorByStatus = {
   neutral: 'bg-muted-foreground',
 } as const;
 
+const overlayDotColorByStatus = {
+  success: 'bg-emerald-300',
+  warning: 'bg-amber-300',
+  destructive: 'bg-red-300',
+  neutral: 'bg-white/90',
+} as const;
+
 interface StatusBadgeProps
   extends React.ComponentProps<'span'>, VariantProps<typeof statusBadgeVariants> {
   /** Hide the leading dot indicator (label text remains — never colour-only). */
@@ -42,22 +55,25 @@ interface StatusBadgeProps
 
 function StatusBadge({
   status = 'neutral',
+  presentation = 'default',
   hideDot,
   className,
   children,
   ...props
 }: StatusBadgeProps) {
   const resolvedStatus = status ?? 'neutral';
+  const dotColors = presentation === 'overlay' ? overlayDotColorByStatus : dotColorByStatus;
+
   return (
     <span
       data-slot="status-badge"
-      className={cn(statusBadgeVariants({ status }), className)}
+      className={cn(statusBadgeVariants({ status, presentation }), className)}
       {...props}
     >
       {!hideDot && (
         <span
           aria-hidden="true"
-          className={cn('size-1.5 shrink-0 rounded-full', dotColorByStatus[resolvedStatus])}
+          className={cn('size-1.5 shrink-0 rounded-full', dotColors[resolvedStatus])}
         />
       )}
       {children}

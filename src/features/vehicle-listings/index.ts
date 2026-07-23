@@ -19,11 +19,15 @@ export {
 
 export { useVehicleListingParams } from './lib/use-vehicle-listing-params';
 
+export { getPaginationItems } from './lib/pagination';
+
 export {
   VehicleFilters,
   VehicleFilterBar,
   VehicleFilterSheet,
   VehicleSortSelect,
+  VehiclePagination,
+  VehiclePageSizeSelect,
   ActiveFilterChips,
   ClearFiltersButton,
 } from './components';

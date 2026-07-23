@@ -85,11 +85,29 @@ function useVehicleListingParams(defaults: VehicleListingQuery = CARS_LISTING_DE
     });
   }, [navigateToQuery, defaults]);
 
+  const goToPage = useCallback(
+    (page: number) => {
+      const current = getCurrentQuery();
+      navigateToQuery({ ...current, page });
+    },
+    [getCurrentQuery, navigateToQuery],
+  );
+
+  const setPageSize = useCallback(
+    (pageSize: number, baseQuery?: VehicleListingQuery) => {
+      const current = baseQuery ?? getCurrentQuery();
+      navigateToQuery({ ...current, pageSize, page: 1 });
+    },
+    [getCurrentQuery, navigateToQuery],
+  );
+
   return {
     applyQuery,
     removeFilterKeys,
     clearAllFilters,
     getCurrentQuery,
+    goToPage,
+    setPageSize,
   };
 }
 

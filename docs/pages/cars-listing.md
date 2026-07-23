@@ -1,28 +1,29 @@
 # Cars listing page (`/cars`)
 
-Phase **2.2.4** — server-rendered current-stock inventory with URL-driven filters and sorting.
+Phase **2.2.5** — server-rendered current-stock inventory with URL-driven filters, sorting, and pagination.
 
 ## Responsibilities
 
 - Fetch published current-stock vehicles via **`getVehicles()`** from
   `@/services/vehicle.service`
 - Parse and validate URL search parameters through **`VehicleListingQuery`**
-- Render **`VehicleCard`** in a responsive grid
-- Provide filter, sort, loading, empty, and error-ready UX
-- Preserve pagination contract in URL (UI deferred to Phase 2.2.5)
+- Render **`VehicleCard`** in a responsive paginated grid
+- Provide filter, sort, pagination, loading, empty, and error-ready UX
 
 ## Data flow
 
 ```
-/cars?make=BMW&sort=price_asc (Server Component)
+/cars?make=BMW&sort=price_asc&page=2&pageSize=24 (Server Component)
     ↓
 parseVehicleListingSearchParams(searchParams)
     ↓
-getVehicles(query) + getVehicleFilterOptions({ status })
+getVehicleFilterOptions({ status }) + Suspense → getVehicles(query)
     ↓
 VehicleService → MockVehicleRepository (today) / Prisma (future)
     ↓
 VehicleFilters (client URL updates) + VehicleInventoryGrid → VehicleCard
+    ↓
+VehiclePagination + VehiclePageSizeSelect
 ```
 
 **Never** import raw mock arrays or call HTTP APIs from the page.
@@ -31,21 +32,21 @@ VehicleFilters (client URL updates) + VehicleInventoryGrid → VehicleCard
 
 Supported parameters (validated via `vehicleListingQuerySchema`):
 
-| Parameter      | Type / values                                                   | Notes                                    |
-| -------------- | --------------------------------------------------------------- | ---------------------------------------- |
-| `make`         | string                                                          | Exact make from public inventory         |
-| `model`        | string                                                          | Filtered by selected make in UI          |
-| `fuelType`     | `PETROL`, `DIESEL`, `ELECTRIC`, `HYBRID`, `OTHER`               | Enum from domain                         |
-| `transmission` | `MANUAL`, `AUTOMATIC`, `SEMI_AUTOMATIC`                         | Enum from domain                         |
-| `bodyType`     | body enum values                                                | Enum from domain                         |
-| `status`       | status enum (comma-separated for multiple)                      | Omitted when default scope               |
-| `minPrice`     | non-negative integer                                            | GBP whole pounds                         |
-| `maxPrice`     | non-negative integer                                            | Dropped if less than `minPrice`          |
-| `minYear`      | integer                                                         | Registration year                        |
-| `maxMileage`   | non-negative integer                                            | Miles                                    |
-| `sort`         | `newest`, `price_asc`, `price_desc`, `mileage_asc`, `year_desc` | Omitted when `newest`                    |
-| `page`         | positive integer                                                | Preserved in contract; UI in 2.2.5       |
-| `pageSize`     | positive integer (max 48)                                       | Default loads all current stock (48 max) |
+| Parameter      | Type / values                                                   | Notes                                          |
+| -------------- | --------------------------------------------------------------- | ---------------------------------------------- |
+| `make`         | string                                                          | Exact make from public inventory               |
+| `model`        | string                                                          | Filtered by selected make in UI                |
+| `fuelType`     | fuel enum values                                                | Enum from domain                               |
+| `transmission` | transmission enum values                                        | Enum from domain                               |
+| `bodyType`     | body enum values                                                | Enum from domain                               |
+| `status`       | status enum (comma-separated for multiple)                      | Omitted when default scope                     |
+| `minPrice`     | non-negative integer                                            | GBP whole pounds                               |
+| `maxPrice`     | non-negative integer                                            | Dropped if less than `minPrice`                |
+| `minYear`      | integer                                                         | Registration year                              |
+| `maxMileage`   | non-negative integer                                            | Miles                                          |
+| `sort`         | `newest`, `price_asc`, `price_desc`, `mileage_asc`, `year_desc` | Omitted when `newest`                          |
+| `page`         | positive integer                                                | Omitted when `1`                               |
+| `pageSize`     | `12`, `24`, or `36`                                             | Omitted when `12` (default); max domain cap 48 |
 
 ### Parsing rules
 
@@ -55,119 +56,123 @@ Supported parameters (validated via `vehicleListingQuerySchema`):
 - Empty strings behave as **unset**
 - Default values are centralized in `CARS_LISTING_DEFAULTS`
 - `minPrice > maxPrice` → `maxPrice` is removed during normalization
+- Invalid `pageSize` values snap to **12**
 
 ### Default query
 
-| Parameter  | Value                                  | Notes                                  |
-| ---------- | -------------------------------------- | -------------------------------------- |
-| `status`   | `AVAILABLE`, `RESERVED`, `COMING_SOON` | Excludes sold + hidden                 |
-| `sort`     | `newest`                               | Omitted from URL when unchanged        |
-| `page`     | `1`                                    | Reset on filter/sort changes           |
-| `pageSize` | `MAX_VEHICLE_PAGE_SIZE` (48)           | All results until pagination UI exists |
+| Parameter  | Value                                  | Notes                           |
+| ---------- | -------------------------------------- | ------------------------------- |
+| `status`   | `AVAILABLE`, `RESERVED`, `COMING_SOON` | Excludes sold + hidden          |
+| `sort`     | `newest`                               | Omitted from URL when unchanged |
+| `page`     | `1`                                    | Omitted from URL when unchanged |
+| `pageSize` | `12`                                   | Omitted from URL when unchanged |
+
+## Pagination
+
+### URL examples
+
+- `/cars?page=2`
+- `/cars?make=BMW&sort=price_desc&page=3`
+- `/cars?fuelType=PETROL&pageSize=24&page=2`
+
+### Page-reset rules
+
+| Action            | `page` behaviour | Filters / sort |
+| ----------------- | ---------------- | -------------- |
+| Filter change     | Reset to `1`     | Updated        |
+| Sort change       | Reset to `1`     | Preserved      |
+| Page-size change  | Reset to `1`     | Preserved      |
+| Page navigation   | Updated          | Preserved      |
+| Clear all filters | Reset to `1`     | Cleared        |
+
+### Invalid-page handling
+
+When the requested `page` exceeds `totalPages`, is below `1`, or is otherwise out of range:
+
+1. `applyVehicleListingQuery` clamps to the nearest valid page (repository layer).
+2. `CarsInventorySection` compares the URL page with the clamped result page.
+3. If they differ, the server issues a **redirect** to the canonical URL via `buildCarsListingHref`.
+
+This avoids crashes, empty grids, and redirect loops — the target page is always valid.
+
+### Page-size options
+
+User-selectable values: **12**, **24**, **36** (`VEHICLE_LISTING_PAGE_SIZE_OPTIONS`).
+
+Domain maximum remains **48** for API/query validation; UI does not expose larger values.
+
+### Components
+
+| Component               | Role                                                      |
+| ----------------------- | --------------------------------------------------------- |
+| `VehiclePagination`     | Previous/Next, numbered pages (desktop), mobile indicator |
+| `VehiclePageSizeSelect` | Compact per-page selector                                 |
+| `getPaginationItems`    | Deterministic page-number / ellipsis algorithm            |
+| `CarsInventorySection`  | Server block — fetch, summary, grid, pagination           |
+| `CarsInventoryFallback` | Suspense skeleton during param navigation                 |
+
+### Mobile pagination
+
+- **Previous** / **Next** with 44px touch targets
+- Compact **“Page X of Y”** indicator (`lg:hidden`)
+- Numbered page buttons hidden below `lg` to prevent overflow
+- Page-size selector remains in the summary row above the grid
+
+### Scroll behaviour
+
+Page navigation scrolls to `#cars-inventory-heading` (not the document top). Uses `scrollIntoView` with reduced-motion respect — no custom scroll animation system.
 
 ## Filter architecture
 
 Location: `src/features/vehicle-listings/`
 
-| Piece                                 | Role                                                              |
-| ------------------------------------- | ----------------------------------------------------------------- |
-| `parseVehicleListingSearchParams`     | Server + client shared parser                                     |
-| `serializeVehicleListingSearchParams` | URL writer — omits defaults                                       |
-| `useVehicleListingParams`             | Client hook — `applyQuery`, `removeFilterKeys`, `clearAllFilters` |
-| `VehicleFilters`                      | Orchestrates desktop bar, mobile sheet, sort, chips               |
-| `VehicleFilterBar`                    | Desktop toolbar — immediate URL updates                           |
-| `VehicleFilterSheet`                  | Mobile bottom sheet — draft state, Apply / Clear                  |
-| `VehicleSortSelect`                   | Sort control — immediate URL update                               |
-| `ActiveFilterChips`                   | Removable chips + clear all                                       |
-| `VehicleFilterFields`                 | Shared form fields (make/model dependency)                        |
+| Piece                                 | Role                                             |
+| ------------------------------------- | ------------------------------------------------ |
+| `parseVehicleListingSearchParams`     | Server + client shared parser                    |
+| `serializeVehicleListingSearchParams` | URL writer — omits defaults                      |
+| `useVehicleListingParams`             | Client hook — filters, `goToPage`, `setPageSize` |
+| `VehicleFilters`                      | Desktop bar, mobile sheet, sort, chips           |
+| `ActiveFilterChips`                   | Removable chips + clear all                      |
 
 **URL is the single source of truth.** No global state, no client-side inventory fetching.
 
-### Reset-to-page-1 rule
-
-Filter and sort changes reset `page` to `1` via `useVehicleListingParams` (pagination UI will rely on this in 2.2.5).
-
-### Make / model dependency
-
-- Options from `getVehicleFilterOptions({ status: CARS_LISTING_DEFAULT_STATUS })`
-- `modelsByMake` drives dependent model dropdown
-- Changing make clears incompatible model (client draft + URL commit)
-- Options are sorted alphabetically; only published public inventory
-
-## Desktop filter layout
-
-- Horizontal filter grid (`lg+`) above the inventory grid
-- Fields: make, model, min/max price, fuel, transmission, body type, min year, max mileage
-- Sort control in the top row (right-aligned on larger breakpoints)
-- Clear all aligned under the toolbar
-- Native styled selects (`FilterSelect`) for consistency and progressive enhancement
-
-## Mobile filter experience
-
-- Prominent **Filters** button with active-filter count badge
-- Bottom sheet with vertically stacked controls + status field
-- **Apply filters** commits draft to URL; **Clear all** resets defaults
-- Result count shown in sheet header
-- Large touch targets (`h-11`), keyboard-accessible Sheet primitive
-
-## Sorting options
-
-| Label                | URL value     |
-| -------------------- | ------------- |
-| Newest               | `newest`      |
-| Price: Low to High   | `price_asc`   |
-| Price: High to Low   | `price_desc`  |
-| Mileage: Low to High | `mileage_asc` |
-| Year: Newest First   | `year_desc`   |
-
-Sort changes preserve filters, reset page to 1, and use `router.push` with `scroll: false`.
-
-## Active-filter chips
-
-- Rendered when any non-default filter is active
-- Readable labels (e.g. `BMW`, `Automatic`, `Up to £50,000`)
-- Non-default sort shown as a removable chip
-- Each chip removes only its filter; page resets to 1
-- **Clear all** when multiple chips are active
-
 ## Result summary
 
-Dynamic copy from actual `total`:
+Dynamic copy from actual paginated values:
 
-- `15 vehicles` — no inventory filters
-- `6 vehicles matching your filters` — filters active
-- `No vehicles match your current filters` — filtered empty state heading
+- `Showing 1–12 of 38 vehicles`
+- `Showing 13–24 of 38 vehicles`
+- `Showing 6 vehicles matching your filters` (single page, filtered)
+- `Showing 1–12 of 18 vehicles matching your filters` (multi-page, filtered)
+- `No vehicles match your current filters` — filtered empty state
 
 Subtitle: `All vehicles · Newest first` or `Filtered results · {sort label}`.
 
 ## Empty states
 
-| Condition                      | Component                                            |
-| ------------------------------ | ---------------------------------------------------- |
-| Zero public stock (no filters) | `CarsEmptyState`                                     |
-| Filters return zero matches    | `CarsFilteredEmptyState` (+ clear filters + contact) |
+| Condition                      | Pagination / page-size | Component                                            |
+| ------------------------------ | ---------------------- | ---------------------------------------------------- |
+| Zero public stock (no filters) | Hidden                 | `CarsEmptyState`                                     |
+| Filters return zero matches    | Hidden                 | `CarsFilteredEmptyState` (+ chips + clear + contact) |
 
-## Page structure
-
-1. **`CarsPageHero`** — muted internal-page hero
-2. **Summary + filters** — count, sort, desktop bar / mobile sheet, chips
-3. **Inventory grid** or empty state
-4. **`CarsBottomCta`** — contact / sell-your-car links
-
-## Grid behaviour
-
-`VehicleInventoryGrid` — same responsive columns as Phase 2.2.3. Subtle opacity transition on query change via `VehicleInventoryResults` (reduced-motion safe).
+Active filter chips remain visible above the empty state when filters are applied.
 
 ## Loading state
 
-`loading.tsx` — hero skeletons, filter bar skeleton (`CarsFiltersFallback`), card grid skeletons.
+- **`loading.tsx`** — hero + filter + inventory skeletons (initial route load)
+- **`CarsInventoryFallback`** — Suspense fallback when search params change (grid + summary + pagination skeleton only; header/footer/filters stay mounted)
+
+## SEO note (future)
+
+Filtered and paginated URLs are clean (defaults omitted from query strings). Before launch, consider **canonical URLs** and selective **noindex** for low-value filter/page combinations to avoid thin indexed variants — not implemented in this phase.
 
 ## Intentionally deferred
 
-- Pagination controls (URL `page` / `pageSize` contract is ready)
 - Vehicle detail page (`/cars/[slug]`)
 - Auto Trader integration
 - Homepage featured section wiring
+- Recently Sold listing page
+- Broad canonical/noindex rules
 
 ## Related docs
 

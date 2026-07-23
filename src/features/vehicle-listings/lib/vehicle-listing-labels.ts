@@ -6,7 +6,10 @@ import {
   VEHICLE_STATUS_LABELS,
 } from '@/features/vehicles/vehicle.constants';
 import { formatVehiclePrice } from '@/features/vehicles/vehicle.utils';
-import type { VehicleListingQuery } from '@/features/vehicles/vehicle.types';
+import type {
+  PaginatedVehicleResult,
+  VehicleListingQuery,
+} from '@/features/vehicles/vehicle.types';
 
 import { CARS_LISTING_DEFAULTS, statusMatchesDefault } from './vehicle-listing-search-params';
 
@@ -119,18 +122,36 @@ function getSortLabel(sort: VehicleListingQuery['sort']): string {
   return VEHICLE_SORT_LABELS[sort ?? 'newest'];
 }
 
-function getInventorySummaryHeading(total: number, query: VehicleListingQuery): string {
+function getInventorySummaryHeading(
+  listing: Pick<PaginatedVehicleResult, 'total' | 'page' | 'pageSize' | 'totalPages'>,
+  query: VehicleListingQuery,
+): string {
+  const { total, page, pageSize, totalPages } = listing;
   const vehicleWord = total === 1 ? 'vehicle' : 'vehicles';
 
   if (total === 0 && hasActiveInventoryFilters(query)) {
     return 'No vehicles match your current filters';
   }
 
-  if (hasActiveInventoryFilters(query)) {
-    return `${total} ${vehicleWord} matching your filters`;
+  if (total === 0) {
+    return `0 ${vehicleWord}`;
   }
 
-  return `${total} ${vehicleWord}`;
+  const rangeStart = (page - 1) * pageSize + 1;
+  const rangeEnd = Math.min(page * pageSize, total);
+
+  if (hasActiveInventoryFilters(query)) {
+    if (totalPages <= 1) {
+      return `Showing ${total} ${vehicleWord} matching your filters`;
+    }
+    return `Showing ${rangeStart}–${rangeEnd} of ${total} vehicles matching your filters`;
+  }
+
+  if (totalPages <= 1) {
+    return `${total} ${vehicleWord}`;
+  }
+
+  return `Showing ${rangeStart}–${rangeEnd} of ${total} ${vehicleWord}`;
 }
 
 function getInventorySummaryMeta(query: VehicleListingQuery): string {
