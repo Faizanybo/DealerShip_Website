@@ -1,4 +1,4 @@
-# Homepage & Public Route Scaffolding (Phase 2.1 + Hero Elevation + Hero Composition + Intro Motion)
+# Homepage & Public Route Scaffolding (Phase 2.1 + Hero Elevation + Hero Composition + Intro Motion + Studio Lighting)
 
 Foundation-only. This documents the homepage hero, the homepage's structural section foundation, and
 the temporary "content in progress" shells for the other public routes introduced in Phase 2.1, the
@@ -83,16 +83,41 @@ every word onto a separate line") rather than a bug.
 
 ### Hero vehicle image (`src/components/layout/hero-vehicle.tsx`)
 
-`public/images/placeholder/hero-vehicle.jpg` is a **generated placeholder image** — a generic,
-brandless dark sedan silhouette with no manufacturer logos, badges, or plates, shot as if in a dark
-studio so it blends into the hero background. It is explicitly **not** real dealership photography and
-must be replaced with client-supplied photography before production. It's rendered with `next/image`
-(`fill`, `priority` since it's an above-the-fold LCP candidate, explicit `sizes`), `object-contain`, a
-soft `drop-shadow`, and a **radial** (not just bottom) mask-image gradient so every edge — not only the
-bottom — fades into the hero background rather than ending in a hard rectangular edge. A slow (`8s`,
-looping) vertical float starts once the vehicle reveals — `prefers-reduced-motion` disables it entirely,
-leaving the image static. A restrained bronze rim light and a soft floor reflection reveal alongside it
-with a slight stagger (see `docs/motion-guidelines.md`).
+`public/images/placeholder/hero-vehicle.jpg` is a **generated placeholder image** (1400×933, ~73 KB) —
+a generic, brandless dark sedan silhouette with no manufacturer logos, badges, or plates. It is
+explicitly **not** real dealership photography and must be replaced with client-supplied photography
+before production.
+
+Rendered with `next/image` (`fill`, `priority` as the LCP candidate, `sizes="(min-width: 1280px) 42vw,
+(min-width: 1024px) 50vw, 90vw"`), `object-contain object-[center_52%]` (slightly lowered for grounding),
+layered drop-shadows, and a radial mask-image so no rectangular asset boundary is visible. The parent
+`aspect-[4/3]` box reserves layout space before the image decodes — no CLS.
+
+### Vehicle studio lighting (Subphase 2.1.4)
+
+The right column is a self-contained CSS studio scene (`VehicleStudioScene` inside `hero-vehicle.tsx`),
+using tokens from `globals.css` (`--hero-studio-*`, derived from `--brand-accent` and hero neutrals):
+
+| Layer              | Purpose                                                       |
+| ------------------ | ------------------------------------------------------------- |
+| Dark radial base   | Local alcove depth inside the vehicle box                     |
+| Bronze spotlight   | Radial pool behind the car; subtle opacity pulse after reveal |
+| Vertical streak    | Restrained highlight (`sm:`+ only)                            |
+| Floor illumination | Horizontal light pool under the vehicle                       |
+| Edge vignette      | Softens box edges into the hero-wide background               |
+| Inline SVG grain   | Texture without a network request (`sm:`+ only)               |
+
+Vehicle integration (`VehicleVisual`): elliptical grounding shadow, CSS-only floor reflection (no
+duplicated image), bronze rim-light glow, and refined edge mask. The hero-wide `HeroBackground` blooms
+were toned down so the local studio lighting reads as one composition with the left copy column — not
+two independent sections.
+
+**Mobile reductions:** vertical streak, grain, and floor-reflection blur are omitted below `sm:`;
+spotlight uses `blur-2xl` instead of `blur-3xl`. Ambient motion is disabled entirely under
+`prefers-reduced-motion`.
+
+Post-reveal ambient motion (~3px vertical float / 10s, spotlight and rim-light opacity drift) is
+documented in [`docs/motion-guidelines.md`](./motion-guidelines.md) → "Post-reveal ambient motion".
 
 ### Text/image handoff — an overlay, not a stacked block
 
@@ -125,8 +150,8 @@ competing with it:
 1. A dark diagonal gradient (`oklch` stops) as the base.
 2. A soft, blurred bronze "light bloom" (top-right) and a cooler blue one (bottom-left) for abstract
    depth — decorative only, not representational of anything.
-3. A third, fainter light bloom centred behind where the vehicle sits on `lg:`, echoed by a matching
-   glow directly behind the vehicle in `HeroVehicle` — a subtle "studio rim light" effect.
+3. A third, fainter light bloom centred behind where the vehicle sits on `lg:` — kept subtle because
+   the vehicle box owns its local studio spotlight (see "Vehicle studio lighting" above).
 4. A dark vignette gradient on top for text readability regardless of viewport.
 5. A faint inline SVG grain (`feTurbulence`, encoded as a `data:` URI) so the gradient doesn't look
    flat — no network request, zero bytes over the wire beyond the inline markup.

@@ -92,16 +92,17 @@ function HeroBackground() {
       />
       <div
         className="absolute -top-1/3 -right-1/4 h-[60%] w-[60%] rounded-full blur-3xl"
-        style={{ background: 'oklch(0.62 0.11 55 / 0.18)' }}
+        style={{ background: 'oklch(0.62 0.11 55 / 0.12)' }}
       />
       <div
         className="absolute bottom-0 left-0 h-[45%] w-[45%] rounded-full blur-3xl"
         style={{ background: 'oklch(0.42 0.05 255 / 0.2)' }}
       />
-      {/* Faint rim light centred behind where the vehicle sits (right side on lg:). */}
+      {/* Faint rim light centred behind where the vehicle sits (right side on lg:).
+          Kept subtle — the vehicle box owns its local studio spotlight (see hero-vehicle.tsx). */}
       <div
         className="absolute top-1/2 right-[8%] h-[70%] w-[38%] -translate-y-1/2 rounded-full blur-3xl"
-        style={{ background: 'oklch(0.9 0.01 260 / 0.08)' }}
+        style={{ background: 'oklch(0.9 0.01 260 / 0.05)' }}
       />
       {/* Readability vignette so text stays legible regardless of what sits behind it. */}
       <div

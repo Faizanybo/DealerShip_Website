@@ -76,3 +76,21 @@ typewriter-effect gimmick that actively delays the user from seeing the actual p
 If a future requirement wants it to replay (e.g. per distinct vehicle in a future carousel), that's a
 deliberate product decision requiring new triggering logic — not a side effect of this component's
 default behavior.
+
+## Post-reveal ambient motion (Subphase 2.1.4)
+
+After the one-time intro completes and the vehicle has revealed, a **continuous but nearly imperceptible**
+ambient loop begins — only when `prefers-reduced-motion` is **not** set:
+
+| Element          | Motion                        | Duration | Notes                                       |
+| ---------------- | ----------------------------- | -------- | ------------------------------------------- |
+| Vehicle image    | Vertical float `0 → -3px → 0` | `10s`    | No horizontal movement, bounce, or rotation |
+| Bronze spotlight | Opacity `0.85 → 1 → 0.85`     | `10s`    | Starts after reveal (`delay: 1.1s`)         |
+| Rim-light glow   | Opacity `0.45 → 0.6 → 0.45`   | `12s`    | Slightly offset timing from the vehicle     |
+
+Under `prefers-reduced-motion: reduce`, the entire scene is **static** after the instant vehicle reveal
+— no float, no glow drift, no opacity loops.
+
+These loops are intentionally subtle (2–4px movement, long durations) so they add life without
+competing with the left-column copy or feeling like a gimmick. They must never re-trigger the
+character intro sequence.
