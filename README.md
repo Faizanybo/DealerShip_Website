@@ -4,10 +4,10 @@ A production-grade, premium automotive dealership website. This repository is th
 flagship internal project that will eventually integrate with **Auto Trader Connect APIs**
 (Stock Sync, Search, Webhooks, Valuations, etc.).
 
-> **Status:** Phase 1.3 — Design System Foundation. No business logic, pages, navigation, or Auto
-> Trader integrations have been implemented yet. This phase adds the shadcn/ui-based component
-> foundation, design tokens, typography, layout primitives, and motion utilities on top of the
-> Phase 1.1 project foundation and Phase 1.2 database layer.
+> **Status:** Phase 1.4 — Application Shell & Navigation. No homepage, vehicle pages, Auto Trader
+> integrations, or authentication have been implemented yet. This phase adds the responsive
+> Header/Footer application shell, centralized site/navigation configuration, and the public vs.
+> future admin layout boundary, on top of the Phase 1.3 design system.
 
 ---
 
@@ -107,11 +107,13 @@ The Next.js app always runs on the host via `pnpm dev` — only PostgreSQL runs 
 ├── src/
 │   ├── app/                # Next.js App Router routes, layouts, and pages
 │   │   ├── globals.css       # Design tokens (colour/spacing/shape/motion) + Tailwind theme mapping
+│   │   ├── layout.tsx         # Root layout — <html>/<body>, fonts. No Header/Footer (shell-agnostic)
+│   │   ├── (public)/          # Public route group: skip link + Header + <main> + Footer
 │   │   └── design-system/    # Temporary internal design-system preview route (remove before prod)
 │   ├── components/
 │   │   ├── ui/              # shadcn/ui primitives + typography + project button/badge/form wrappers
-│   │   └── layout/          # PageShell, Container, Section, SectionHeader
-│   ├── config/              # Centralized, typed app configuration & env parsing
+│   │   └── layout/          # PageShell/Container/Section/SectionHeader + Header/Footer/BrandMark/nav
+│   ├── config/              # Centralized, typed app configuration & env parsing (site.ts, navigation.ts)
 │   ├── features/            # Feature/domain modules (vehicle-listings, admin-dashboard, auth)
 │   ├── hooks/               # Shared, cross-feature React hooks
 │   ├── integrations/        # Typed clients/adapters for third-party APIs (autotrader, email)
@@ -154,6 +156,10 @@ before adding code to a given layer.
   instead of raw hex/px values — see [`docs/design-system.md`](./docs/design-system.md).
 - **Compose, don't duplicate, shadcn/ui primitives**: project-specific components (`PrimaryButton`,
   `StatusBadge`, `FormField`, etc.) wrap `components/ui/*` rather than re-implementing them.
+- **Dealership info lives only in `src/config/site.ts`**: never hardcode a phone number, address, or
+  nav link inside a component — see [`docs/application-shell.md`](./docs/application-shell.md).
+- **Public vs. admin shells stay separate**: public routes live under `src/app/(public)/`; a future
+  admin dashboard gets its own route group/layout and must not import the public `Header`/`Footer`.
 - **Naming**: `kebab-case` for folders and non-component files, `PascalCase` for React components,
   `camelCase` for variables/functions, `SCREAMING_SNAKE_CASE` for environment variable names.
 - **Imports** use the `@/*` path alias rooted at `src/` instead of deep relative paths.
@@ -285,19 +291,38 @@ pnpm dev
 
 ---
 
+## Application Shell
+
+Phase 1.4 introduced the responsive application shell: a typed site configuration
+(`src/config/site.ts`) and navigation model (`src/config/navigation.ts`), a sticky responsive
+`Header` (desktop nav + shadcn `Sheet`-based mobile menu), a premium dark `Footer`, a temporary
+text-based `BrandMark`, and a `(public)` route group layout (skip link + Header + `<main>` +
+Footer) kept separate from the root layout so a future admin shell won't inherit it.
+
+Full reference: [`docs/application-shell.md`](./docs/application-shell.md).
+
+Only the `/` home route (still the unmodified `create-next-app` placeholder, just relocated) exists
+today — `Cars`, `Recently Sold`, `About`, and `Contact` are configured in the nav as planned routes
+and will 404 until their pages are built in later phases.
+
+---
+
 ## Future Roadmap (High Level)
 
 1. **Phase 1.1 — Foundation** _(done)_: project scaffolding, tooling, structure.
 2. **Phase 1.2 — Local database foundation** _(done)_: PostgreSQL via Docker, Prisma schema
    and client setup, migration + connectivity verification. No domain schema yet.
-3. **Phase 1.3 — Design system** _(this phase)_: shadcn/ui integration, design tokens, typography,
+3. **Phase 1.3 — Design system** _(done)_: shadcn/ui integration, design tokens, typography,
    layout primitives, reusable UI wrappers, motion utilities, `/design-system` preview.
-4. **Phase 1.4 — Authentication**: session/auth strategy for staff and customer accounts.
-5. **Phase 2 — Vehicle Listings**: search, filtering, and listing detail pages.
-6. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations.
-7. **Phase 4 — Admin Dashboard**: internal tooling for dealership staff.
-8. **Phase 5 — Analytics, logging, and observability**.
-9. **Phase 6 — Testing strategy and CI/CD pipelines**.
+4. **Phase 1.4 — Application shell & navigation** _(this phase)_: site/navigation configuration,
+   responsive Header/Footer, public vs. admin layout boundary.
+5. **Phase 1.5 — Authentication**: session/auth strategy for staff and customer accounts.
+6. **Phase 2 — Vehicle Listings**: search, filtering, and listing detail pages.
+7. **Phase 3 — Auto Trader Connect integration**: Stock Sync, Search, Webhooks, Valuations.
+8. **Phase 4 — Admin Dashboard**: internal tooling for dealership staff (own layout — see
+   [`docs/application-shell.md`](./docs/application-shell.md) → "Public vs. future admin layout boundary").
+9. **Phase 5 — Analytics, logging, and observability**.
+10. **Phase 6 — Testing strategy and CI/CD pipelines**.
 
 ---
 

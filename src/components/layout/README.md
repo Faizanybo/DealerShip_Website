@@ -12,7 +12,10 @@ Structural, app-wide layout building blocks (site header, footer, navigation she
 - **`section.tsx`** — `Section`: full-bleed vertical rhythm + background tone (`page` / `muted` /
   `hero`). `tone="hero"` locally applies the `dark` scope for cinematic sections.
 - **`section-header.tsx`** — `SectionHeader`: eyebrow + title + description heading block.
+- **`header.tsx`** — `Header`: sticky site header (client component). Composes `brand-mark.tsx`,
+  `desktop-nav.tsx`, and `mobile-nav.tsx`.
+- **`footer.tsx`** — `Footer`: premium dark footer (server component), reads `siteConfig`.
+- **`brand-mark.tsx`** — `BrandMark`: temporary text + abstract-glyph logo, `currentColor`-based.
 
-Header, footer, and navigation are intentionally not implemented yet (later phase).
-
-See `docs/design-system.md` for usage guidance and examples.
+See `docs/design-system.md` for layout-primitive usage, and `docs/application-shell.md` for the
+Header/Footer/navigation conventions.

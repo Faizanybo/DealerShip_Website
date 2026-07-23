@@ -108,7 +108,8 @@ repeating these classes.
 </Section>
 ```
 
-Header, footer, and navigation are **not** implemented yet — later phase.
+Header, footer, and navigation (Phase 1.4) build on these primitives — see
+[`docs/application-shell.md`](./application-shell.md).
 
 ## Component conventions (`src/components/ui`)
 
