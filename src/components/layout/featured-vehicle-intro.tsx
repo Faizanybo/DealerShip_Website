@@ -16,7 +16,7 @@ const PREMIUM_EASE = [0.16, 1, 0.3, 1] as const;
  * and the target ~2.5–3.5s total. Kept as named constants (not magic
  * numbers) since the stage-transition timers below are derived from them.
  */
-const INITIAL_DELAY_MS = 280;
+const INITIAL_DELAY_MS = 480;
 const CHAR_STAGGER_MS = 50;
 const CHAR_DURATION_MS = 280;
 const HOLD_MS = 650;
@@ -56,7 +56,7 @@ const charVariants: Variants = {
 };
 
 const captionClassName =
-  'font-display text-[clamp(0.9375rem,2.6vw+0.5rem,1.5rem)] font-extrabold tracking-[0.12em] uppercase';
+  'font-display text-[clamp(0.875rem,2.4vw+0.45rem,1.375rem)] font-bold tracking-[0.1em] uppercase';
 
 const captionGradientStyle: React.CSSProperties = {
   backgroundImage: 'linear-gradient(90deg, var(--brand-accent), var(--hero-muted-foreground) 85%)',

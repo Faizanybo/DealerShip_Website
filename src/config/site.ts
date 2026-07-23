@@ -53,6 +53,14 @@ export interface SiteConfig {
   businessHours: BusinessHoursEntry[];
   /** Rendered in the footer alongside the dynamic current year. */
   copyrightHolder: string;
+  hero: {
+    /**
+     * PLACEHOLDER trust-strip claims for the homepage hero only — neutral,
+     * unsupported marketing copy until the client confirms real statements.
+     * Replace every entry before launch; do not invent new claims here.
+     */
+    trustItems: readonly string[];
+  };
 }
 
 export const siteConfig: SiteConfig = {
@@ -83,4 +91,7 @@ export const siteConfig: SiteConfig = {
     { days: 'Sunday', hours: 'Closed' },
   ],
   copyrightHolder: 'Placeholder Motors',
+  hero: {
+    trustItems: ['Carefully inspected vehicles', 'Transparent pricing', 'Flexible finance'],
+  },
 };

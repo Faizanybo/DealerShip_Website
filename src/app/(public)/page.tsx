@@ -33,8 +33,7 @@ export default function HomePage() {
         supportingText={`We're putting together a straightforward, no-nonsense way to browse, compare, and buy your next car from ${siteConfig.dealershipName}. Explore what's currently available or get in touch with any questions.`}
         primaryCta={{ label: 'Browse Inventory', href: '/cars' }}
         secondaryCta={{ label: 'Contact Sales', href: '/contact' }}
-        // Neutral placeholders — replace with client-confirmed copy before launch.
-        trustItems={['Carefully inspected vehicles', 'Transparent pricing', 'Flexible finance']}
+        trustItems={siteConfig.hero.trustItems}
         scrollTargetId="intro"
       />
 

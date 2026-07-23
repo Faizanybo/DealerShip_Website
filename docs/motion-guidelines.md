@@ -1,96 +1,205 @@
 # Motion Guidelines
 
-Project-wide conventions for Motion (Framer Motion, imported as `motion/react`) usage live in
-[`docs/design-system.md`](./design-system.md) (durations, easing, `src/lib/motion`). This file covers
-one specific, higher-stakes animation in detail: the homepage hero's one-time featured-vehicle intro —
-so its timing/behavior contract is documented in one place instead of only living in code comments.
+Project-wide conventions for Motion (`motion/react`) and CSS micro-interactions. Shared
+timing tokens live in [`docs/design-system.md`](./design-system.md) and
+`src/lib/motion/transitions.ts` — keep CSS `--ease-premium` and `premiumEase` in sync.
 
-## Featured-vehicle intro (`src/components/layout/featured-vehicle-intro.tsx`)
+This document covers the homepage hero end-to-end: entrance timeline, micro-interactions,
+navigation polish, reduced-motion rules, and conventions future sections should follow.
 
-On first load, the hero's vehicle visual (`hero-vehicle.tsx`) doesn't show the vehicle immediately.
-Instead, a short, **one-time** sequence plays inside the same fixed-size box the vehicle will occupy:
+---
 
-1. `intro` — the phrase **"OUR FEATURE VEHICLE"** appears one character at a time.
-2. `holding` — the complete phrase stays visible briefly.
-3. `exiting` — characters disappear in reverse order (last-in, first-out).
-4. `vehicle` — the text is gone; the vehicle image (plus its ambient spotlight, rim light, and floor
-   reflection) reveals with a premium one-shot entrance, then settles into its ongoing slow float.
+## Easing conventions
 
-### Why a typed state machine, not scattered booleans
+| Token / export   | Value                           | Use                                        |
+| ---------------- | ------------------------------- | ------------------------------------------ |
+| `premiumEase`    | `cubic-bezier(0.16, 1, 0.3, 1)` | Reveals, hovers, scroll cue, nav underline |
+| `--ease-premium` | same (CSS)                      | Tailwind/CSS transitions in hero CTAs      |
+| `easeInOut`      | Motion default                  | Slow ambient loops only                    |
 
-`FeaturedVehicleIntro` tracks a single `IntroStage` (`'intro' | 'holding' | 'exiting' | 'vehicle'`)
-rather than several independent booleans (`isTyping`, `isHolding`, `isExiting`, …), which would make
-invalid combinations representable (e.g. "holding" and "exiting" both `true`). Each stage's `useEffect`
-schedules exactly one `setTimeout` to advance to the next stage and cleans it up on
-unmount/stage-change — so there's never more than one pending timer, and no state update can fire after
-the component has unmounted.
+**Rules:** decelerating ease-out for entrances and hovers; no bounce, elastic, or spring
+on marketing surfaces unless explicitly requested.
 
-Once `stage` reaches `'vehicle'`, the component calls `onIntroComplete()` (so `HeroVehicle` can reveal
-the vehicle) and renders `null` — it does not keep a hidden DOM node around, and nothing loops back to
-`'intro'`.
+---
 
-### Timing budget
+## Interaction durations
 
-| Stage transition               | Duration                            | Notes                                                                                    |
-| ------------------------------ | ----------------------------------- | ---------------------------------------------------------------------------------------- |
-| Mount → first character starts | `~280ms` initial delay              | Lets the hero's own entrance settle first.                                               |
-| Character entrance stagger     | `~50ms` per character               | Applied via `staggerChildren`, not per-character timers.                                 |
-| Complete phrase hold           | `~650ms`                            | The only stage with a "pure" wait — nothing animates.                                    |
-| Reverse-order removal stagger  | `~32ms` per character               | `staggerDirection: -1` — same children, reversed order.                                  |
-| Text → vehicle handoff         | folded into the exit's own duration | No separate delay; `onIntroComplete` fires right as the last character finishes exiting. |
+| Interaction               | Duration    | Notes                                           |
+| ------------------------- | ----------- | ----------------------------------------------- |
+| Hero content reveal       | `350–550ms` | Per-element fade-up                             |
+| Hero stagger step         | `60ms`      | Between eyebrow → headline → copy → CTAs        |
+| Trust-item stagger        | `60ms`      | Nested after CTAs; `350ms` per item             |
+| Primary CTA hover         | `300ms`     | translateY + shadow + arrow                     |
+| Secondary CTA hover       | `300ms`     | border/background + 1px lift                    |
+| Nav underline grow        | `200ms`     | scale-x from centre; bronze accent              |
+| Scroll indicator loop     | `3s`        | Pill + dot drift; hidden below `sm:`            |
+| Featured-vehicle intro    | `~2.5–3s`   | One-time; see below                             |
+| Post-reveal ambient float | `10–12s`    | ≤4px movement; see "Post-reveal ambient motion" |
 
-Total: roughly **2.5–3 seconds** end-to-end for a 19-character phrase — short and intentional, not a
-showpiece. If the phrase ever changes, the timing scales automatically (it's derived from
-`PHRASE.length`, not hardcoded per-character counts).
+---
 
-### Reduced motion
+## Hero timeline (first load)
 
-When `prefers-reduced-motion: reduce` is set, the character-by-character choreography is skipped
-entirely: the complete phrase renders as static text (no stagger, no per-character motion) for a single
-short `350ms` hold, then the vehicle appears immediately with an instant opacity swap and no translation/
-scale/blur — see `vehicleVariantsReduced` in `hero-vehicle.tsx`. No timer in the reduced-motion path is
-long enough to meaningfully delay content.
+Left and right columns may overlap slightly; decorative motion never blocks interaction.
 
-### Accessibility
+| Order | Element                            | ~Start   | Component                    |
+| ----- | ---------------------------------- | -------- | ---------------------------- |
+| 1     | Eyebrow                            | `20ms`   | `hero-content.tsx`           |
+| 2     | Headline lines (staggered)         | `80ms+`  | `hero-content.tsx`           |
+| 3     | Supporting paragraph               | ~`200ms` | `hero-content.tsx`           |
+| 4     | CTAs (**interactive immediately**) | ~`260ms` | `hero-content.tsx`           |
+| 5     | Trust items (sequential)           | ~`320ms` | `hero-content.tsx`           |
+| 6     | "OUR FEATURE VEHICLE" intro        | ~`480ms` | `featured-vehicle-intro.tsx` |
+| 7     | Vehicle reveal + studio lighting   | ~`3s`    | `hero-vehicle.tsx`           |
+| 8     | Scroll indicator fade-in           | ~`1.15s` | `hero-scroll-indicator.tsx`  |
 
-- The full phrase is exposed to assistive tech via a `sr-only` span containing the plain string.
-- The animated character spans are wrapped in a container marked `aria-hidden="true"` — screen readers
-  never see fragmented, one-letter-at-a-time content.
-- No typewriter cursor — considered and deliberately omitted (an extra decorative element competing with
-  the "reads once, cleanly" goal).
+CTAs and nav links are focusable from first paint — animations are visual-only (`opacity` /
+`transform`), never `pointer-events: none`.
 
-### Layout stability
+Variants: `staggerHero`, `fadeUpHero`, `staggerTrust`, `fadeUpTrust` in
+`src/lib/motion/variants.ts`, selected via `useMotionVariants()`.
 
-The intro text and the vehicle image are both **absolutely positioned inside the same fixed
-`aspect-[4/3]` box** (an overlay, not stacked blocks) — see `hero-vehicle.tsx`. This is why swapping one
-for the other never shifts the hero's height, on any viewport. The vehicle `<Image>` itself is mounted
-from the very first render (so `priority` can actually preload it while the text plays) — it's just
-`opacity: 0` until revealed, so there's no fetch/decode delay right when it needs to appear.
+---
 
-### Why this must not become a repeating gimmick
+## Button behaviour (hero CTAs)
 
-The sequence runs **exactly once per page mount** — there is no interval, no re-trigger on scroll/hover/
-route change, and the component unmounts itself once done. Re-running it (on every visit, every
-re-render, or on a timer loop) would turn a one-time "welcome" moment into a distracting, dated
-typewriter-effect gimmick that actively delays the user from seeing the actual product (the vehicle).
-If a future requirement wants it to replay (e.g. per distinct vehicle in a future carousel), that's a
-deliberate product decision requiring new triggering logic — not a side effect of this component's
-default behavior.
+Implemented with **CSS transitions** (not Motion scale) so touch devices get `:active`
+states without relying on hover.
+
+**Primary (`Browse Inventory`):**
+
+- Hover: `translateY(-2px)`, shadow `subtle → elevated`, arrow `+4px` right
+- Active: returns to `translateY(0)`, shadow resets
+- Focus: `ring-2` via `focus-visible:ring-focus-ring`
+- Weight: `font-semibold`
+
+**Secondary (`Contact Sales`):**
+
+- Hover: `translateY(-1px)`, border lightens, `bg-white/10`
+- Active: flat position, `bg-white/5`
+- No scale or flashy fill sweep
+
+---
+
+## Navigation interactions
+
+Desktop nav (`desktop-nav.tsx`, `xl:`+):
+
+- Active route: bronze underline at full width (`bg-brand-accent`, `scale-x-100`)
+- Inactive: underline grows from **centre** on hover/focus (`scale-x-0 → scale-x-100`)
+- Duration: `200ms`, `premiumEase`
+- No `layoutId` sliding between routes — avoids exaggerated motion
+- Keyboard: `focus-visible:ring-2` on each link; opacity reaches `100%` on focus
+
+Navigation items and route structure are unchanged — polish only.
+
+---
+
+## Featured-vehicle intro
+
+See [`featured-vehicle-intro.tsx`](../src/components/layout/featured-vehicle-intro.tsx).
+
+One-time state machine: `intro → holding → exiting → vehicle`. Character stagger uses
+Motion; timers cleaned up on unmount. Full phrase in `sr-only`; animated letters
+`aria-hidden`.
+
+| Stage transition              | Duration                         |
+| ----------------------------- | -------------------------------- |
+| Mount → first character       | `~480ms` (after left CTAs/trust) |
+| Character entrance stagger    | `~50ms` per character            |
+| Complete phrase hold          | `~650ms`                         |
+| Reverse-order removal stagger | `~32ms` per character            |
+
+**Must not loop.** Re-running on every visit would delay access to the vehicle.
+
+### Reduced motion (intro)
+
+Static phrase for `350ms`, then instant vehicle reveal — no character choreography,
+no translate/scale/blur on the vehicle.
+
+---
 
 ## Post-reveal ambient motion (Subphase 2.1.4)
 
-After the one-time intro completes and the vehicle has revealed, a **continuous but nearly imperceptible**
-ambient loop begins — only when `prefers-reduced-motion` is **not** set:
+After the one-time intro completes — only when `prefers-reduced-motion` is **not** set:
 
-| Element          | Motion                        | Duration | Notes                                       |
-| ---------------- | ----------------------------- | -------- | ------------------------------------------- |
-| Vehicle image    | Vertical float `0 → -3px → 0` | `10s`    | No horizontal movement, bounce, or rotation |
-| Bronze spotlight | Opacity `0.85 → 1 → 0.85`     | `10s`    | Starts after reveal (`delay: 1.1s`)         |
-| Rim-light glow   | Opacity `0.45 → 0.6 → 0.45`   | `12s`    | Slightly offset timing from the vehicle     |
+| Element          | Motion                        | Duration |
+| ---------------- | ----------------------------- | -------- |
+| Vehicle image    | Vertical float `0 → -3px → 0` | `10s`    |
+| Bronze spotlight | Opacity `0.85 → 1 → 0.85`     | `10s`    |
+| Rim-light glow   | Opacity `0.45 → 0.6 → 0.45`   | `12s`    |
 
-Under `prefers-reduced-motion: reduce`, the entire scene is **static** after the instant vehicle reveal
-— no float, no glow drift, no opacity loops.
+Under reduced motion: **completely static** after reveal.
 
-These loops are intentionally subtle (2–4px movement, long durations) so they add life without
-competing with the left-column copy or feeling like a gimmick. They must never re-trigger the
-character intro sequence.
+---
+
+## Scroll indicator
+
+- Hidden below `sm:` — stacked mobile hero is tall enough without an extra cue
+- Desktop/tablet: pill fades in once (`delay: 1.15s`), then loops gently
+- Pill: `translateY(0 → 4px → 0)`, opacity `0.65 → 1 → 0.65`, `3s` loop
+- Inner dot: `6px` travel on the track, matching opacity fade
+- No bouncing chevron/arrow
+- Reduced motion: static indicator, no loop
+
+---
+
+## Reduced-motion rules (summary)
+
+When `prefers-reduced-motion: reduce`:
+
+| Area             | Behaviour                                      |
+| ---------------- | ---------------------------------------------- |
+| Hero entrance    | Instant opacity (no stagger, no translate)     |
+| Trust strip      | All items appear together                      |
+| Featured intro   | Static phrase → instant vehicle                |
+| Vehicle reveal   | Opacity only                                   |
+| Ambient float    | Off                                            |
+| Scroll indicator | Static, no loop                                |
+| CTA hover motion | CSS still works; no Motion scale on hero CTAs  |
+| Nav underline    | Instant (CSS transition duration unchanged OK) |
+
+Never hide or delay links/buttons behind animation timers.
+
+---
+
+## Trust strip placeholders
+
+Copy lives in `siteConfig.hero.trustItems` (`src/config/site.ts`) — marked **PLACEHOLDER**.
+Neutral claims only; replace with client-confirmed statements before launch. Reveal uses
+one-time staggered fade-up; no continuous animation.
+
+---
+
+## Rules for future sections
+
+When adding motion elsewhere in the site:
+
+1. **Prefer CSS** for hovers/press states on buttons and links; reserve Motion for
+   orchestrated reveals and one-off sequences.
+2. **Use shared variants** from `src/lib/motion` — add reduced-motion pairs for every
+   new variant; wire through `useMotionVariants()`.
+3. **Never block interaction** — animate `opacity`/`transform` only; links stay focusable.
+4. **One-shot by default** — looping motion is for ambient/atmosphere only (scroll cue,
+   vehicle float), never for headlines or CTAs.
+5. **Respect tokens** — bronze accent (`--brand-accent`), `premiumEase`, documented
+   durations; no unrelated colours or bounce easing.
+6. **Mobile-first cost** — hide expensive decorative layers on narrow viewports when they
+   don't earn their keep (see vehicle studio `sm:` gates in `hero-vehicle.tsx`).
+7. **Document** new sequences here with a timeline table before shipping.
+
+---
+
+## Client-component boundaries (homepage hero)
+
+| Component              | Client? | Responsibility                       |
+| ---------------------- | ------- | ------------------------------------ |
+| `Hero`                 | No      | Layout shell, `HeroBackground`       |
+| `HeroContent`          | Yes     | Left entrance + CTA CSS interactions |
+| `HeroVehicle`          | Yes     | Studio scene, reveal, ambient float  |
+| `FeaturedVehicleIntro` | Yes     | Character intro state machine        |
+| `HeroScrollIndicator`  | Yes     | Scroll cue loop                      |
+| `DesktopNav`           | Yes     | Active route (pathname only)         |
+
+Keep new client islands as small as possible; do not convert the homepage page component
+to a Client Component.

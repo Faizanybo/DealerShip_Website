@@ -11,8 +11,8 @@ interface HeroProps {
   supportingText: string;
   primaryCta: HeroCta;
   secondaryCta: HeroCta;
-  /** Short, neutral placeholder trust points — see `HeroContent` for the "replace before launch" note. */
-  trustItems: string[];
+  /** PLACEHOLDER trust claims — sourced from `siteConfig.hero.trustItems`; replace before launch. */
+  trustItems: readonly string[];
   /** Section id on the page below to scroll to — renders a scroll indicator when set. */
   scrollTargetId?: string;
 }
@@ -59,9 +59,9 @@ function Hero({
 
       <Container
         size="wide"
-        className="relative z-10 flex flex-1 flex-col justify-center py-20 sm:py-24 lg:py-16"
+        className="relative z-10 flex flex-1 flex-col justify-center py-16 sm:py-20 lg:py-16 xl:py-20"
       >
-        <div className="grid grid-cols-1 items-center gap-10 sm:gap-12 lg:grid-cols-[0.8fr_1fr] lg:gap-12 xl:gap-16">
+        <div className="grid grid-cols-1 items-center gap-8 sm:gap-12 lg:grid-cols-[0.8fr_1fr] lg:gap-12 xl:gap-16">
           <HeroContent
             eyebrow={eyebrow}
             headlineLines={headlineLines}

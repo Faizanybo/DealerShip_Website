@@ -69,9 +69,10 @@ A client component (needs `usePathname()` for active-route state and a scroll-po
 kept as small and focused as possible; it is not the whole app.
 
 - **Desktop**: brand mark on the left (visible at every width), the inline nav (`desktop-nav.tsx`,
-  `xl:` and up — see "Desktop nav breakpoint" above) with an animated underline under the active item
-  (`motion`, shared `layoutId`, skipped entirely under `prefers-reduced-motion`), and a "Call us" CTA
-  (`tel:` link, visible from `sm:`) on the right.
+  `xl:` and up — see "Desktop nav breakpoint" above) with a bronze underline on the active item and
+  a centre-growing bronze underline on hover/focus (`200ms`, CSS-only — see
+  [`docs/motion-guidelines.md`](./motion-guidelines.md) → "Navigation interactions"), and a "Call us"
+  CTA (`tel:` link, visible from `sm:`) on the right.
 - **Mobile**: compact brand + a 44px icon-only menu button opening the existing shadcn `Sheet`
   (`mobile-nav.tsx`) from the right, `85vw` wide capped at `max-w-sm` (fits 320px). Focus trap,
   `Esc` to close, and body-scroll locking are inherited for free from Radix. Selecting a link closes

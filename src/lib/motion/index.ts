@@ -6,13 +6,21 @@ import {
   fadeIn,
   fadeInReduced,
   fadeUp,
+  fadeUpHero,
+  fadeUpHeroReduced,
   fadeUpReduced,
+  fadeUpTrust,
+  fadeUpTrustReduced,
   mobileMenuTransition,
   mobileMenuTransitionReduced,
   scaleInteraction,
   scaleInteractionReduced,
   staggerContainer,
   staggerContainerReduced,
+  staggerHero,
+  staggerHeroReduced,
+  staggerTrust,
+  staggerTrustReduced,
 } from './variants';
 
 export * from './transitions';
@@ -21,7 +29,11 @@ export * from './variants';
 const variantPairs = {
   fadeIn: [fadeIn, fadeInReduced],
   fadeUp: [fadeUp, fadeUpReduced],
+  fadeUpHero: [fadeUpHero, fadeUpHeroReduced],
+  fadeUpTrust: [fadeUpTrust, fadeUpTrustReduced],
   staggerContainer: [staggerContainer, staggerContainerReduced],
+  staggerHero: [staggerHero, staggerHeroReduced],
+  staggerTrust: [staggerTrust, staggerTrustReduced],
   mobileMenuTransition: [mobileMenuTransition, mobileMenuTransitionReduced],
 } as const;
 

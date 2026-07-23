@@ -1,6 +1,6 @@
 import type { Transition, Variants } from 'motion/react';
 
-import { fastTransition, normalTransition, slowTransition } from './transitions';
+import { fastTransition, normalTransition, premiumEase, slowTransition } from './transitions';
 
 /**
  * Reusable Motion variants. Import only where animation is actually needed —
@@ -42,6 +42,60 @@ export const staggerContainer: Variants = {
 export const staggerContainerReduced: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0, delayChildren: 0 } },
+};
+
+/** Homepage hero left column — tighter stagger so CTAs appear quickly. */
+export const staggerHero: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.06, delayChildren: 0.02 },
+  },
+};
+
+export const staggerHeroReduced: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0, delayChildren: 0 } },
+};
+
+/** Trust strip — sequential reveal after CTAs (nested inside hero stagger). */
+export const staggerTrust: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.06, delayChildren: 0 },
+  },
+};
+
+export const staggerTrustReduced: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0, delayChildren: 0 } },
+};
+
+export const fadeUpHero: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: premiumEase } as Transition,
+  },
+};
+
+export const fadeUpHeroReduced: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0 } },
+};
+
+export const fadeUpTrust: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: premiumEase } as Transition,
+  },
+};
+
+export const fadeUpTrustReduced: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0 } },
 };
 
 /** Spread onto `whileHover`/`whileTap` for interactive elements (cards, icon buttons). */
