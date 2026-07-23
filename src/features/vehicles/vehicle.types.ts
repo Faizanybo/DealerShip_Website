@@ -102,6 +102,8 @@ export interface PaginatedVehicleResult {
 export interface VehicleFilterOptions {
   makes: string[];
   models: string[];
+  /** Models available per make — for dependent model dropdowns. */
+  modelsByMake: Record<string, string[]>;
   fuelTypes: FuelType[];
   transmissions: TransmissionType[];
   bodyTypes: BodyType[];

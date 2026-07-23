@@ -3,10 +3,12 @@ import { Section } from '@/components/layout/section';
 import { LoadingCard } from '@/components/ui/loading-card';
 import { Skeleton } from '@/components/ui/skeleton';
 
+import { CarsFiltersFallback } from './_components/cars-filters-fallback';
+
 const SKELETON_COUNT = 6;
 
 /**
- * Route-level loading UI for `/cars` — mirrors hero, summary, and card grid
+ * Route-level loading UI for `/cars` — mirrors hero, summary, filters, and card grid
  * proportions to prevent layout shift.
  */
 export default function CarsLoading() {
@@ -22,9 +24,12 @@ export default function CarsLoading() {
 
       <Section spacing="normal">
         <Container size="wide" className="flex flex-col gap-8 sm:gap-10">
-          <div className="flex flex-col gap-2">
-            <Skeleton className="h-7 w-40" />
-            <Skeleton className="h-4 w-48" />
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-7 w-48" />
+              <Skeleton className="h-4 w-56" />
+            </div>
+            <CarsFiltersFallback />
           </div>
 
           <ul

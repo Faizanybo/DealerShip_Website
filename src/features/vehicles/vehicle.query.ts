@@ -80,6 +80,19 @@ function buildVehicleFilterOptions(vehicles: readonly Vehicle[]): VehicleFilterO
   const transmissions = [...new Set(published.map((vehicle) => vehicle.transmission))].sort();
   const bodyTypes = [...new Set(published.map((vehicle) => vehicle.bodyType))].sort();
 
+  const modelsByMake: Record<string, string[]> = {};
+  for (const vehicle of published) {
+    if (!modelsByMake[vehicle.make]) {
+      modelsByMake[vehicle.make] = [];
+    }
+    if (!modelsByMake[vehicle.make]!.includes(vehicle.model)) {
+      modelsByMake[vehicle.make]!.push(vehicle.model);
+    }
+  }
+  for (const make of Object.keys(modelsByMake)) {
+    modelsByMake[make]!.sort();
+  }
+
   const prices = published.map((vehicle) => vehicle.price);
   const years = published.map((vehicle) => vehicle.registrationYear);
   const mileages = published.map((vehicle) => vehicle.mileage);
@@ -87,6 +100,7 @@ function buildVehicleFilterOptions(vehicles: readonly Vehicle[]): VehicleFilterO
   return {
     makes,
     models,
+    modelsByMake,
     fuelTypes,
     transmissions,
     bodyTypes,
@@ -105,4 +119,13 @@ function buildVehicleFilterOptions(vehicles: readonly Vehicle[]): VehicleFilterO
   };
 }
 
-export { applyVehicleListingQuery, buildVehicleFilterOptions };
+function filterVehiclesForScope(
+  vehicles: readonly Vehicle[],
+  scope?: Pick<VehicleListingQuery, 'status'>,
+): Vehicle[] {
+  const published = vehicles.filter((vehicle) => vehicle.isPublished);
+  if (!scope?.status) return published;
+  return published.filter((vehicle) => matchesStatus(vehicle, scope.status));
+}
+
+export { applyVehicleListingQuery, buildVehicleFilterOptions, filterVehiclesForScope };

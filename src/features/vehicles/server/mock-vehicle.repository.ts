@@ -1,7 +1,11 @@
 import 'server-only';
 
 import { vehicleListingQuerySchema } from '../vehicle.schemas';
-import { applyVehicleListingQuery, buildVehicleFilterOptions } from '../vehicle.query';
+import {
+  applyVehicleListingQuery,
+  buildVehicleFilterOptions,
+  filterVehiclesForScope,
+} from '../vehicle.query';
 import type { VehicleRepository } from '../vehicle.repository';
 import type {
   PaginatedVehicleResult,
@@ -48,8 +52,11 @@ class MockVehicleRepository implements VehicleRepository {
     return vehicle;
   }
 
-  async getVehicleFilterOptions(): Promise<VehicleFilterOptions> {
-    return buildVehicleFilterOptions(this.vehicles);
+  async getVehicleFilterOptions(
+    scope?: Pick<VehicleListingQuery, 'status'>,
+  ): Promise<VehicleFilterOptions> {
+    const scoped = filterVehiclesForScope(this.vehicles, scope);
+    return buildVehicleFilterOptions(scoped);
   }
 }
 

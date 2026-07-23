@@ -31,8 +31,10 @@ async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   return vehicleRepository.getVehicleBySlug(slug);
 }
 
-async function getVehicleFilterOptions(): Promise<VehicleFilterOptions> {
-  return vehicleRepository.getVehicleFilterOptions();
+async function getVehicleFilterOptions(
+  scope?: Pick<VehicleListingQuery, 'status'>,
+): Promise<VehicleFilterOptions> {
+  return vehicleRepository.getVehicleFilterOptions(scope);
 }
 
 export {

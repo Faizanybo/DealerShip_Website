@@ -14,5 +14,7 @@ export interface VehicleRepository {
   getFeaturedVehicles(limit?: number): Promise<Vehicle[]>;
   getRecentlySoldVehicles(limit?: number): Promise<Vehicle[]>;
   getVehicleBySlug(slug: string): Promise<Vehicle | null>;
-  getVehicleFilterOptions(): Promise<VehicleFilterOptions>;
+  getVehicleFilterOptions(
+    scope?: Pick<VehicleListingQuery, 'status'>,
+  ): Promise<VehicleFilterOptions>;
 }
