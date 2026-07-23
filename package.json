@@ -29,7 +29,8 @@
     "db:validate": "prisma validate",
     "db:format": "prisma format",
     "db:studio": "prisma studio",
-    "db:check": "node scripts/check-db-connection.ts"
+    "db:check": "node scripts/check-db-connection.ts",
+    "vehicles:validate-mock": "tsx scripts/validate-mock-vehicles.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.0",
@@ -47,7 +48,8 @@
     "server-only": "^0.0.1",
     "shadcn": "^4.14.0",
     "tailwind-merge": "^3.6.0",
-    "tw-animate-css": "^1.4.0"
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -61,6 +63,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "prisma": "^7.9.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.1",
     "typescript": "^5"
   }
 }
