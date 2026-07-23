@@ -29,10 +29,10 @@ export default function HomePage() {
         // narrower columns, so the visual line count varies by viewport.
         // Content mirrors `siteConfig.tagline`; full sentence is still one
         // semantic <h1> (see the `aria-label` in `hero-content.tsx`).
-        headlineLines={['Premium Vehicles,', 'Honestly Presented.']}
+        headlineLines={['Premium vehicles,', 'honestly presented.']}
         supportingText={`We're putting together a straightforward, no-nonsense way to browse, compare, and buy your next car from ${siteConfig.dealershipName}. Explore what's currently available or get in touch with any questions.`}
-        primaryCta={{ label: 'Browse Inventory', href: '/cars' }}
-        secondaryCta={{ label: 'Contact Sales', href: '/contact' }}
+        primaryCta={{ label: 'Browse cars', href: '/cars' }}
+        secondaryCta={{ label: 'Contact us', href: '/contact' }}
         trustItems={siteConfig.hero.trustItems}
         scrollTargetId="intro"
       />

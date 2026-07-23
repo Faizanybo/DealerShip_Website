@@ -174,24 +174,25 @@
    * (Applying the `dark` class to a section wrapper activates the full
    * `.dark` palette locally — see docs/design-system.md.)
    */
-  --hero-background: oklch(0.17 0.008 260);
-  --hero-foreground: oklch(0.97 0.003 260);
-  --hero-muted-foreground: oklch(0.72 0.006 260);
-  --hero-border: oklch(1 0 0 / 12%);
+  --hero-background: oklch(0.06 0.002 260);
+  --hero-foreground: oklch(0.98 0.003 260);
+  --hero-muted-foreground: oklch(0.68 0.006 260);
+  --hero-border: oklch(1 0 0 / 14%);
 
   /*
    * Vehicle studio scene (homepage hero right column) — derived from brand
    * accent + hero neutrals. Used by `hero-vehicle.tsx` only; see
    * docs/homepage.md → "Vehicle studio lighting".
    */
-  --hero-studio-base: oklch(0.13 0.006 260);
-  --hero-studio-spotlight: oklch(0.62 0.11 55 / 0.22);
-  --hero-studio-spotlight-core: oklch(0.68 0.1 55 / 0.14);
-  --hero-studio-streak: oklch(0.75 0.02 55 / 0.07);
-  --hero-studio-floor: oklch(0.78 0.01 260 / 0.16);
-  --hero-studio-rim: oklch(0.72 0.12 55 / 0.2);
-  --hero-studio-vignette: oklch(0 0 0 / 0.45);
-  --hero-studio-ground-shadow: oklch(0 0 0 / 0.55);
+  --hero-studio-base: oklch(0.08 0.004 260);
+  --hero-studio-spotlight: oklch(0.62 0.11 55 / 0.28);
+  --hero-studio-spotlight-core: oklch(0.68 0.1 55 / 0.18);
+  --hero-studio-streak: oklch(0.75 0.12 55 / 0.45);
+  --hero-studio-streak-core: oklch(0.82 0.14 55 / 0.75);
+  --hero-studio-floor: oklch(0.78 0.01 260 / 0.2);
+  --hero-studio-rim: oklch(0.72 0.12 55 / 0.28);
+  --hero-studio-vignette: oklch(0 0 0 / 0.55);
+  --hero-studio-ground-shadow: oklch(0 0 0 / 0.65);
 }
 
 /* -----------------------------------------------------------------------

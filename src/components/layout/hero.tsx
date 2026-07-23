@@ -3,6 +3,7 @@ import { Section } from './section';
 import { HeroContent, type HeroCta } from './hero-content';
 import { HeroScrollIndicator } from './hero-scroll-indicator';
 import { HeroVehicle } from './hero-vehicle';
+import type { HeroTrustItem } from '@/config/site';
 
 interface HeroProps {
   eyebrow: string;
@@ -11,8 +12,8 @@ interface HeroProps {
   supportingText: string;
   primaryCta: HeroCta;
   secondaryCta: HeroCta;
-  /** PLACEHOLDER trust claims — sourced from `siteConfig.hero.trustItems`; replace before launch. */
-  trustItems: readonly string[];
+  /** PLACEHOLDER trust columns — sourced from `siteConfig.hero.trustItems`; replace before launch. */
+  trustItems: readonly HeroTrustItem[];
   /** Section id on the page below to scroll to — renders a scroll indicator when set. */
   scrollTargetId?: string;
 }
@@ -61,7 +62,7 @@ function Hero({
         size="wide"
         className="relative z-10 flex flex-1 flex-col justify-center py-16 sm:py-20 lg:py-16 xl:py-20"
       >
-        <div className="grid grid-cols-1 items-center gap-8 sm:gap-12 lg:grid-cols-[0.8fr_1fr] lg:gap-12 xl:gap-16">
+        <div className="grid grid-cols-1 items-center gap-10 sm:gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-10 xl:gap-14">
           <HeroContent
             eyebrow={eyebrow}
             headlineLines={headlineLines}
@@ -82,39 +83,40 @@ function Hero({
 /** Purely decorative — no photographic or textual content, so it's fully `aria-hidden`. */
 function HeroBackground() {
   return (
-    <div aria-hidden="true" className="absolute inset-0 z-0">
+    <div aria-hidden="true" className="absolute inset-0 z-0 bg-black">
+      {/* Subtle left-side depth — keeps copy column readable without lifting overall luminance. */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(160deg, oklch(0.22 0.012 255) 0%, oklch(0.14 0.006 260) 55%, oklch(0.1 0.004 260) 100%)',
+            'radial-gradient(ellipse 70% 80% at 18% 42%, oklch(0.14 0.006 260 / 0.55) 0%, transparent 62%)',
+        }}
+      />
+      {/* Hero-wide vertical god-ray aligned with the vehicle column (reference mockup). */}
+      <div
+        className="absolute top-0 right-[8%] hidden h-full w-px lg:block xl:right-[12%]"
+        style={{
+          background:
+            'linear-gradient(180deg, transparent 0%, oklch(0.72 0.12 55 / 0.22) 42%, oklch(0.78 0.14 55 / 0.35) 50%, oklch(0.72 0.12 55 / 0.22) 58%, transparent 100%)',
         }}
       />
       <div
-        className="absolute -top-1/3 -right-1/4 h-[60%] w-[60%] rounded-full blur-3xl"
-        style={{ background: 'oklch(0.62 0.11 55 / 0.12)' }}
+        className="absolute top-[6%] right-[4%] hidden h-[88%] w-24 blur-3xl lg:block xl:right-[8%] xl:w-28"
+        style={{
+          background:
+            'linear-gradient(180deg, transparent 0%, oklch(0.68 0.13 55 / 0.18) 48%, transparent 100%)',
+        }}
       />
-      <div
-        className="absolute bottom-0 left-0 h-[45%] w-[45%] rounded-full blur-3xl"
-        style={{ background: 'oklch(0.42 0.05 255 / 0.2)' }}
-      />
-      {/* Faint rim light centred behind where the vehicle sits (right side on lg:).
-          Kept subtle — the vehicle box owns its local studio spotlight (see hero-vehicle.tsx). */}
-      <div
-        className="absolute top-1/2 right-[8%] h-[70%] w-[38%] -translate-y-1/2 rounded-full blur-3xl"
-        style={{ background: 'oklch(0.9 0.01 260 / 0.05)' }}
-      />
-      {/* Readability vignette so text stays legible regardless of what sits behind it. */}
+      {/* Bottom vignette for scroll cue separation. */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(180deg, oklch(0 0 0 / 0.1) 0%, oklch(0 0 0 / 0.3) 70%, oklch(0 0 0 / 0.55) 100%)',
+            'linear-gradient(180deg, transparent 0%, oklch(0 0 0 / 0.15) 72%, oklch(0 0 0 / 0.65) 100%)',
         }}
       />
-      {/* Faint grain so the gradient doesn't look flat — inline SVG, no network request. */}
       <div
-        className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
+        className="absolute inset-0 opacity-[0.05] mix-blend-overlay"
         style={{
           backgroundImage:
             "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",

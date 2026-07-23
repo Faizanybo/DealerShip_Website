@@ -23,6 +23,12 @@ export interface BusinessHoursEntry {
   hours: string;
 }
 
+/** PLACEHOLDER hero trust column — replace copy before launch. */
+export interface HeroTrustItem {
+  title: string;
+  description: string;
+}
+
 export interface SiteConfig {
   /** Full legal/display name, e.g. in the footer and page titles. */
   dealershipName: string;
@@ -55,11 +61,10 @@ export interface SiteConfig {
   copyrightHolder: string;
   hero: {
     /**
-     * PLACEHOLDER trust-strip claims for the homepage hero only — neutral,
-     * unsupported marketing copy until the client confirms real statements.
-     * Replace every entry before launch; do not invent new claims here.
+     * PLACEHOLDER trust-strip for the homepage hero — neutral claims with
+     * short descriptors. Replace every entry before launch.
      */
-    trustItems: readonly string[];
+    trustItems: readonly HeroTrustItem[];
   };
 }
 
@@ -92,6 +97,19 @@ export const siteConfig: SiteConfig = {
   ],
   copyrightHolder: 'Placeholder Motors',
   hero: {
-    trustItems: ['Carefully inspected vehicles', 'Transparent pricing', 'Flexible finance'],
+    trustItems: [
+      {
+        title: 'Carefully inspected',
+        description: 'Every vehicle checked before it reaches you.',
+      },
+      {
+        title: 'Transparent pricing',
+        description: 'Clear, honest numbers with no hidden fees.',
+      },
+      {
+        title: 'Flexible finance',
+        description: 'Options to suit a range of budgets.',
+      },
+    ],
   },
 };
