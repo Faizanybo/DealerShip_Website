@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Heart, Info, Search, TriangleAlert } from 'lucide-react';
+import { Heart, Info, Search } from 'lucide-react';
 
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
@@ -385,13 +385,16 @@ export default function DesignSystemPreviewPage() {
           </div>
 
           <div className="rounded-card border-border-strong bg-surface-muted flex items-center gap-2 border border-dashed p-4">
-            <TriangleAlert
-              className="text-status-warning-foreground size-4 shrink-0"
-              aria-hidden="true"
-            />
             <BodySmall>
               Reminder: this page is a temporary internal tool for Phase 1.3 verification. Delete or
-              protect the <code>/design-system</code> route before production launch.
+              protect the <code>/design-system</code> route before production launch. See also{' '}
+              <a
+                href="/design-system/vehicle-card"
+                className="text-brand-accent underline-offset-4 hover:underline"
+              >
+                Vehicle card preview
+              </a>
+              .
             </BodySmall>
           </div>
         </Container>

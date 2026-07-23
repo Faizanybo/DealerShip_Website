@@ -35,10 +35,12 @@ export {
 
 export {
   formatRegistrationYear,
+  formatSoldDate,
   formatVehicleDisplayName,
   formatVehicleListingTitle,
   formatVehicleMileage,
   formatVehiclePrice,
+  formatVehiclePriceDisplay,
   getBodyTypeLabel,
   getFuelTypeLabel,
   getTransmissionLabel,

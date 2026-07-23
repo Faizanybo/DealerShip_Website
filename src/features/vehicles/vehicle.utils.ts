@@ -27,6 +27,21 @@ function formatVehiclePrice(price: number): string {
   return GBP_FORMATTER.format(price);
 }
 
+/** Card-safe price label — supports future nullable pricing without domain changes. */
+function formatVehiclePriceDisplay(price: number | null | undefined): string {
+  if (price == null || price < 0) return 'Price on request';
+  return formatVehiclePrice(price);
+}
+
+/** Format sold date for sold cards, e.g. "14 Feb 2026". */
+function formatSoldDate(soldAt: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(soldAt));
+}
+
 /** Format mileage with thousands separators and a miles suffix. */
 function formatVehicleMileage(mileage: number): string {
   return `${MILEAGE_FORMATTER.format(mileage)} miles`;
@@ -109,10 +124,12 @@ function maskRegistrationNumber(registration: string | null): string | null {
 
 export {
   formatRegistrationYear,
+  formatSoldDate,
   formatVehicleDisplayName,
   formatVehicleListingTitle,
   formatVehicleMileage,
   formatVehiclePrice,
+  formatVehiclePriceDisplay,
   getBodyTypeLabel,
   getFuelTypeLabel,
   getTransmissionLabel,

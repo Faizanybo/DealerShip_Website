@@ -13,6 +13,8 @@ that doesn't belong in the top-level `README.md`.
   sequence (timing, stages, reduced-motion behavior, why it must not loop).
 - [`vehicle-domain.md`](./vehicle-domain.md) — internal `Vehicle` domain model, mock inventory, and
   server-side data access (Phase 2.2.1).
+- [`components/vehicle-card.md`](./components/vehicle-card.md) — reusable inventory card component
+  (Phase 2.2.2).
 - [`research/`](./research/README.md) — competitor information-architecture research and Auto Trader
   integration planning notes (not implementation — see that folder's own README for the ground rules).
 
